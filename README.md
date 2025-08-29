@@ -1,11 +1,8 @@
 
   # Site do Buffet Simone
 
-  This is a code bundle for Site do Buffet Simone. The original project is available at https://www.figma.com/design/y4gq1y25wos9pQplXVaENk/Site-do-Buffet-Simone.
+Há mais de 15 anos, a Chef Simone dedica sua vida a criar experiências gastronômicas únicas e memoráveis. O que começou como uma paixão pela culinária familiar se transformou no Buffet Simone, referência em eventos especiais na região.
 
-  ## Running the code
+Nossa filosofia é simples: cada prato conta uma história, cada sabor desperta uma emoção. Utilizamos apenas ingredientes frescos e de qualidade premium, preparados com técnicas tradicionais e um toque especial de carinho.
 
-  Run `npm i` to install the dependencies.
-
-  Run `npm run dev` to start the development server.
-  
+Do planejamento à execução, cuidamos de cada detalhe para que seu evento seja exatamente como você sonhou. Porque acreditamos que momentos especiais merecem sabores inesquecíveis.
