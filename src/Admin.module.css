@@ -1,0 +1,237 @@
+/* === LOGIN PAGE === */
+.florp {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #ffeaf7;
+}
+
+.zigzag {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 350px;
+}
+
+.zigzag h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #e6007e;
+}
+
+.zigzag p {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 1rem;
+}
+
+.zigzag input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.zigzag button {
+    width: 100%;
+    padding: 10px;
+    background: #e6007e;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.zigzag button:hover {
+    background: #cc006e;
+}
+
+/* === DASHBOARD === */
+.bloop {
+    font-family: Arial, sans-serif;
+    background: #fff;
+    min-height: 100vh;
+}
+
+.snarp {
+    background: #e6007e;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+
+.snarp h1 {
+    font-size: 1.3rem;
+}
+
+.zap {
+    background: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 20px;
+    color: #e6007e;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.zap:hover {
+    background: #f5f5f5;
+}
+
+/* === MENU === */
+.wobble {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.wobble h1 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.wobble nav button {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 6px;
+}
+
+.wobble nav button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.sproing {
+    background: white;
+    color: #e6007e;
+    font-weight: bold;
+}
+
+/* === CARDS === */
+.plop {
+    display: flex;
+    justify-content: space-around;
+    margin: 1.5rem;
+    gap: 1rem;
+}
+
+.glop {
+    flex: 1;
+    background: #ffeaf7;
+    padding: 1rem;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.glop h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #444;
+}
+
+.glop p {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #e6007e;
+}
+
+/* === ATIVIDADES === */
+.blop {
+    margin: 1.5rem;
+    background: #f7f7f7;
+    padding: 1rem;
+    border-radius: 12px;
+}
+
+.blop h2 {
+    color: #e6007e;
+    margin-bottom: 0.8rem;
+}
+
+.blop ul {
+    list-style: none;
+    padding: 0;
+}
+
+.blop li {
+    background: white;
+    margin-bottom: 0.5rem;
+    padding: 0.8rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* === AÇÕES RÁPIDAS === */
+.sploosh {
+    margin: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.sploosh button {
+    background: #e6007e;
+    color: white;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    flex: 1;
+}
+
+.sploosh button:hover {
+    background: #cc006e;
+}
+
+/* === FORMULÁRIOS === */
+.froob,
+.froob2,
+.froob3 {
+    margin: 1.5rem;
+}
+
+.swoosh,
+.swoosh2 {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.swoosh input,
+.swoosh2 input,
+.swoosh2 select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.swoosh button,
+.swoosh2 button {
+    padding: 10px;
+    background: #e6007e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.swoosh button:hover,
+.swoosh2 button:hover {
+    background: #cc006e;
+}
