@@ -1,67 +1,118 @@
+// src/components/MenuSection.tsx
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { db } from "../firebaseConfig";
+import { collection, onSnapshot } from "firebase/firestore";
+
+type MenuItem = {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  popular?: boolean;
+};
+
+type MenuCategory = {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  items: MenuItem[];
+};
 
 export function MenuSection() {
-  const menuCategories = [
-    {
-      id: "salgados",
-      name: "Salgados",
-      description: "Deliciosos salgados para sua festa",
-      image: "https://images.unsplash.com/photo-1536739782508-c2388552aad3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxnb3VybWV0JTIwYXBwZXRpemVyc3xlbnwxfHx8fDE3NTU5NTYxODV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      items: [
-        { name: "Coxinhas Premium", description: "Coxinha de frango desfiado com catupiry", price: "R$ 4,50", popular: true },
-        { name: "Pastel de Queijo", description: "Massa crocante com queijo derretido", price: "R$ 3,80" },
-        { name: "Risoles de Camarão", description: "Recheio cremoso de camarão", price: "R$ 5,20", popular: true },
-        { name: "Empadas de Palmito", description: "Massa amanteigada com palmito", price: "R$ 4,00" },
-        { name: "Quiches Sortidas", description: "Queijo, presunto, cogumelos", price: "R$ 4,80" },
-        { name: "Esfirras Abertas", description: "Carne, frango ou queijo", price: "R$ 3,50" }
-      ]
-    },
-    {
-      id: "doces",
-      name: "Doces",
-      description: "Sobremesas irresistíveis",
-      image: "https://images.unsplash.com/photo-1676194661417-e0aeef8fe1fa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYW5jeSUyMGRlc3NlcnRzJTIwcGFzdHJpZXN8ZW58MXx8fHwxNzU1OTU2MTg1fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      items: [
-        { name: "Brigadeiros Gourmet", description: "Chocolate belga, pistache, maracujá", price: "R$ 3,20", popular: true },
-        { name: "Bem-casados", description: "Doce de leite artesanal", price: "R$ 4,50" },
-        { name: "Tortinhas de Limão", description: "Base crocante com creme de limão", price: "R$ 5,80", popular: true },
-        { name: "Profiteroles", description: "Massa choux com creme de baunilha", price: "R$ 6,20" },
-        { name: "Macarons Franceses", description: "Sabores variados", price: "R$ 7,00" },
-        { name: "Cheesecake de Frutas", description: "Morangos, mirtilos, framboesas", price: "R$ 8,50" }
-      ]
-    },
-    {
-      id: "pratos",
-      name: "Pratos Principais",
-      description: "Refeições completas e saborosas",
-      image: "https://images.unsplash.com/photo-1585216045166-56dd417c7f8f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlbGVnYW50JTIwbWFpbiUyMGNvdXJzZSUyMGRpbmluZ3xlbnwxfHx8fDE3NTU5NTYxODZ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      items: [
-        { name: "Salmão Grelhado", description: "Com molho de alcaparras e arroz de brócolis", price: "R$ 48,00", popular: true },
-        { name: "Frango à Parmegiana", description: "Filé empanado com molho e queijo", price: "R$ 32,00" },
-        { name: "Picanha na Chapa", description: "Corte nobre com acompanhamentos", price: "R$ 55,00", popular: true },
-        { name: "Risotto de Camarão", description: "Arroz cremoso com camarões grandes", price: "R$ 42,00" },
-        { name: "Lasanha da Casa", description: "Camadas de massa, carne e queijos", price: "R$ 28,00" },
-        { name: "Bacalhau à Braz", description: "Clássico português com batata palha", price: "R$ 45,00" }
-      ]
-    },
-    {
-      id: "bebidas",
-      name: "Bebidas",
-      description: "Refrescantes e saborosas",
-      image: "https://images.unsplash.com/photo-1685270386242-487b9e1c9fc7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZWZyZXNoaW5nJTIwYmV2ZXJhZ2VzJTIwZHJpbmtzfGVufDF8fHx8MTc1NTk1NjE4Nnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      items: [
-        { name: "Sucos Naturais", description: "Laranja, limão, maracujá, acerola", price: "R$ 8,00", popular: true },
-        { name: "Água de Coco", description: "Geladinha e natural", price: "R$ 6,00" },
-        { name: "Refrigerantes", description: "Coca-Cola, Guaraná, Fanta", price: "R$ 5,00" },
-        { name: "Águas Saborizadas", description: "Limão, morango, maracujá", price: "R$ 4,50", popular: true },
-        { name: "Chás Gelados", description: "Mate, hibisco, frutas vermelhas", price: "R$ 7,00" },
-        { name: "Café Expresso", description: "Blend especial da casa", price: "R$ 4,00" }
-      ]
-    }
-  ];
+  const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
+  useEffect(() => {
+    let unsubscribePratos: () => void;
+    let unsubscribeCategorias: () => void;
+
+    const pratosCollection = collection(db, "pratos");
+    const categoriasCollection = collection(db, "categorias");
+
+    // 🔥 Escuta em tempo real os pratos
+    unsubscribePratos = onSnapshot(pratosCollection, (snapshotPratos) => {
+      const pratos = snapshotPratos.docs.map(doc => {
+        const data = doc.data() as { nome: string; preco: number; categoriaId?: string };
+        return {
+          id: doc.id,
+          name: data.nome,
+          description: "Prato adicionado pelo administrador 🍴",
+          price: `R$ ${data.preco.toFixed(2)}`,
+          categoriaId: data.categoriaId || "sem-categoria",
+        };
+      });
+
+      // Agora pega categorias
+      unsubscribeCategorias = onSnapshot(categoriasCollection, (snapshotCats) => {
+        const categorias = snapshotCats.docs.map(doc => {
+          const data = doc.data() as { nome: string; descricao: string };
+          return {
+            id: doc.id,
+            name: data.nome,
+            description: data.descricao,
+            image: "https://images.unsplash.com/photo-1585216045166-56dd417c7f8f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080", // Pode customizar
+          };
+        });
+
+        // Cria menuCategories combinando categorias e pratos
+        const menu = categorias.map(cat => ({
+          ...cat,
+          items: pratos.filter(p => p.categoriaId === cat.id)
+        }));
+
+        // Se houver pratos sem categoria, criar uma categoria "Outros"
+        const semCategoria = pratos.filter(p => p.categoriaId === "sem-categoria");
+        if (semCategoria.length > 0) {
+          menu.push({
+            id: "outros",
+            name: "Outros Pratos",
+            description: "Pratos ainda sem categoria",
+            image: "https://images.unsplash.com/photo-1585216045166-56dd417c7f8f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+            items: semCategoria
+          });
+        }
+
+        setMenuCategories(menu);
+      });
+    });
+
+    return () => {
+      unsubscribePratos?.();
+      unsubscribeCategorias?.();
+    };
+  }, []);
+
+  useEffect(() => {
+    // Escuta em tempo real os pratos adicionados no Firestore
+    const unsub = onSnapshot(collection(db, "pratos"), (snapshot) => {
+      const pratos: MenuItem[] = snapshot.docs.map((doc) => {
+        const data = doc.data() as { nome: string; preco: number };
+        return {
+          id: doc.id,
+          name: data.nome,
+          description: "Prato adicionado pelo administrador 🍴", // pode expandir depois
+          price: `R$ ${data.preco.toFixed(2)}`
+        };
+      });
+
+      // Aqui você decide em qual categoria os pratos vão entrar
+      // Exemplo: todos no "Pratos Principais"
+      setMenuCategories([
+        {
+          id: "pratos",
+          name: "Pratos Principais",
+          description: "Refeições completas e saborosas",
+          image: "https://images.unsplash.com/photo-1585216045166-56dd417c7f8f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+          items: pratos
+        }
+      ]);
+    });
+
+    return () => unsub();
+  }, []);
 
   return (
     <section id="cardapio" className="py-20 bg-white">
@@ -73,20 +124,22 @@ export function MenuSection() {
             <span>Nosso Cardápio</span>
           </div>
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-4">
-            Sabores que <span className="text-transparent bg-gradient-to-r from-rose-500 to-rose-700 bg-clip-text">Encantam</span>
+            Sabores que{" "}
+            <span className="text-transparent bg-gradient-to-r from-rose-500 to-rose-700 bg-clip-text">
+              Encantam
+            </span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Descubra nossa seleção cuidadosa de pratos, doces e bebidas, 
-            preparados com ingredientes frescos e muito carinho.
+            Descubra nossa seleção de pratos cadastrados pelo administrador.
           </p>
         </div>
 
         {/* Tabs do cardápio */}
-        <Tabs defaultValue="salgados" className="max-w-7xl mx-auto">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-12 bg-rose-50 p-2 rounded-xl">
+        <Tabs defaultValue={menuCategories[0]?.id} className="max-w-7xl mx-auto">
+          <TabsList className="grid w-full grid-cols-1 lg:grid-cols-4 mb-12 bg-rose-50 p-2 rounded-xl">
             {menuCategories.map((category) => (
-              <TabsTrigger 
-                key={category.id} 
+              <TabsTrigger
+                key={category.id}
                 value={category.id}
                 className="data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-sm rounded-lg py-3"
               >
@@ -116,8 +169,11 @@ export function MenuSection() {
 
               {/* Grid de itens */}
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {category.items.map((item, index) => (
-                  <Card key={index} className="group hover:shadow-lg transition-all duration-300 border-rose-100 hover:border-rose-200">
+                {category.items.map((item) => (
+                  <Card
+                    key={item.id}
+                    className="group hover:shadow-lg transition-all duration-300 border-rose-100 hover:border-rose-200"
+                  >
                     <CardContent className="p-6">
                       <div className="flex justify-between items-start mb-3">
                         <h4 className="font-semibold text-gray-800 group-hover:text-rose-600 transition-colors">

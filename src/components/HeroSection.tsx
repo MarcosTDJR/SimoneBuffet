@@ -26,13 +26,13 @@ export function HeroSection() {
                 <Award size={16} />
                 <span>Mais de 15 anos de experiência</span>
               </div>
-              
+
               <h1 className="text-5xl lg:text-6xl font-bold text-gray-800 leading-tight">
                 Buffet <span className="text-transparent bg-gradient-to-r from-rose-500 to-rose-700 bg-clip-text">Simone</span>
               </h1>
-              
+
               <p className="text-xl text-gray-600 leading-relaxed">
-                Transformamos seus momentos especiais em experiências gastronômicas únicas. 
+                Transformamos seus momentos especiais em experiências gastronômicas únicas.
                 Sabores autênticos, ingredientes frescos e o carinho de sempre.
               </p>
             </div>
@@ -46,7 +46,7 @@ export function HeroSection() {
                 <div className="text-2xl font-bold text-gray-800">500+</div>
                 <div className="text-sm text-gray-600">Eventos realizados</div>
               </div>
-              
+
               <div className="text-center">
                 <div className="flex items-center justify-center w-12 h-12 bg-rose-100 rounded-full mx-auto mb-2">
                   <Star className="w-6 h-6 text-rose-600" />
@@ -54,7 +54,7 @@ export function HeroSection() {
                 <div className="text-2xl font-bold text-gray-800">4.9</div>
                 <div className="text-sm text-gray-600">Avaliação média</div>
               </div>
-              
+
               <div className="text-center">
                 <div className="flex items-center justify-center w-12 h-12 bg-rose-100 rounded-full mx-auto mb-2">
                   <Heart className="w-6 h-6 text-rose-600" />
@@ -66,16 +66,16 @@ export function HeroSection() {
 
             {/* Call to actions */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
+              <Button
                 onClick={scrollToCardapio}
-                size="lg" 
+                size="lg"
                 className="bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white px-8 py-4"
               >
                 Ver Cardápio
               </Button>
-              <Button 
-                variant="outline" 
-                size="lg" 
+              <Button
+                variant="outline"
+                size="lg"
                 className="border-rose-300 text-rose-600 hover:bg-rose-50 px-8 py-4"
               >
                 Solicitar Orçamento
@@ -91,10 +91,10 @@ export function HeroSection() {
                 alt="Buffet Simone - Mesa elegante com variedade de pratos"
                 className="w-full h-full object-cover"
               />
-              
+
               {/* Overlay gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-              
+
               {/* Badge flutuante */}
               <div className="absolute top-6 left-6 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
                 <div className="flex items-center gap-2">

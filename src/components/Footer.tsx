@@ -17,7 +17,7 @@ export function Footer() {
               </div>
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
-              Há mais de 15 anos criando momentos especiais através da gastronomia. 
+              Há mais de 15 anos criando momentos especiais através da gastronomia.
               Cada evento é único, cada sabor é inesquecível.
             </p>
             <div className="flex gap-3">
