@@ -235,3 +235,91 @@
 .swoosh2 button:hover {
     background: #cc006e;
 }
+
+.froob3{
+    margin: 3rem;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 100%; 
+}
+
+
+.conteinerphoto1 h2{
+ color: #cc006e;
+ font-size: 20px;
+}
+
+
+.addFoto{
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+
+}
+
+
+.tituloContainer{
+    background-color: #e6007e;
+    color: white;
+    font-weight: bold;
+    padding: 10px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+ 
+}
+
+
+.conteinerCenter{
+ border: 2px solid #cfcfcf ;
+ padding: 100px;
+
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.boxDrag {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  border: 2px dashed #ccc;
+  padding: 80px;
+ 
+}
+
+.btnSelecionar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 12px;
+  background-color: #e6007e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.previewContainer {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.previewLabel {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.previewImage {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
