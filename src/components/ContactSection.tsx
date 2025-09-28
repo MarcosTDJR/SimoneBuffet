@@ -3,8 +3,40 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Phone, MapPin, Clock, Mail, Instagram, Facebook } from "lucide-react";
+import { useState } from "react";
 
 export function ContactSection() {
+  const [nome, setNome] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [email, setEmail] = useState("");
+  const [tipoEvento, setTipoEvento] = useState("");
+  const [dataEvento, setDataEvento] = useState("");
+  const [numConvidados, setNumConvidados] = useState("");
+  const [detalhes, setDetalhes] = useState("");
+  const [temAlergia, setTemAlergia] = useState("não");
+  const [alergias, setAlergias] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const mensagem = `
+Olá, quero solicitar um orçamento:
+- Nome: ${nome}
+- Telefone: ${telefone}
+- E-mail: ${email}
+- Tipo de Evento: ${tipoEvento}
+- Data do Evento: ${dataEvento}
+- Número de Convidados: ${numConvidados}
+- Detalhes: ${detalhes}
+- Possui alergia: ${temAlergia}${temAlergia === "sim" ? ` (${alergias})` : ""}
+    `;
+
+    const numeroWhats = "5511960882764";
+    const url = `https://api.whatsapp.com/send?phone=${numeroWhats}&text=${encodeURIComponent(mensagem)}`;
+
+    window.open(url, "_blank"); // abre WhatsApp em nova aba
+  };
+
   const contactInfo = [
     {
       icon: Phone,
@@ -45,7 +77,7 @@ export function ContactSection() {
             Vamos Conversar sobre seu <span className="text-transparent bg-gradient-to-r from-rose-500 to-rose-700 bg-clip-text">Evento</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Entre em contato conosco e vamos planejar juntos o evento dos seus sonhos. 
+            Entre em contato conosco e vamos planejar juntos o evento dos seus sonhos.
             Estamos prontos para atender você com todo carinho e atenção.
           </p>
         </div>
@@ -68,8 +100,8 @@ export function ContactSection() {
                           {info.details.map((detail, idx) => (
                             <p key={idx} className="text-sm text-gray-600">{detail}</p>
                           ))}
-                          <Button 
-                            variant="link" 
+                          <Button
+                            variant="link"
                             className="text-rose-600 hover:text-rose-700 p-0 h-auto mt-2"
                           >
                             {info.action}
@@ -89,15 +121,15 @@ export function ContactSection() {
               </CardHeader>
               <CardContent>
                 <div className="flex gap-4">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="icon"
                     className="border-rose-200 text-rose-600 hover:bg-rose-50"
                   >
                     <Instagram className="w-5 h-5" />
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="icon"
                     className="border-rose-200 text-rose-600 hover:bg-rose-50"
                   >
@@ -116,83 +148,124 @@ export function ContactSection() {
                 <p className="text-gray-600">Preencha o formulário e entraremos em contato em até 24 horas</p>
               </CardHeader>
               <CardContent className="p-8">
-                <form className="space-y-6">
+                <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Nome Completo *
-                      </label>
-                      <Input 
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Nome Completo *</label>
+                      <Input
                         placeholder="Seu nome completo"
                         className="border-rose-200 focus:border-rose-400 focus:ring-rose-400"
+                        value={nome}
+                        onChange={(e) => setNome(e.target.value)}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Telefone *
-                      </label>
-                      <Input 
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Telefone *</label>
+                      <Input
                         placeholder="(11) 99999-9999"
                         className="border-rose-200 focus:border-rose-400 focus:ring-rose-400"
+                        value={telefone}
+                        onChange={(e) => setTelefone(e.target.value)}
                       />
                     </div>
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        E-mail *
-                      </label>
-                      <Input 
+                      <label className="block text-sm font-medium text-gray-700 mb-2">E-mail *</label>
+                      <Input
                         type="email"
                         placeholder="seu@email.com"
                         className="border-rose-200 focus:border-rose-400 focus:ring-rose-400"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Tipo de Evento
-                      </label>
-                      <Input 
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Evento</label>
+                      <Input
                         placeholder="Casamento, Aniversário, Corporativo..."
                         className="border-rose-200 focus:border-rose-400 focus:ring-rose-400"
+                        value={tipoEvento}
+                        onChange={(e) => setTipoEvento(e.target.value)}
                       />
                     </div>
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Data do Evento
-                      </label>
-                      <Input 
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Data do Evento</label>
+                      <Input
                         type="date"
                         className="border-rose-200 focus:border-rose-400 focus:ring-rose-400"
+                        value={dataEvento}
+                        onChange={(e) => setDataEvento(e.target.value)}
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Número de Convidados
-                      </label>
-                      <Input 
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Número de Convidados</label>
+                      <Input
                         placeholder="Quantidade aproximada"
                         className="border-rose-200 focus:border-rose-400 focus:ring-rose-400"
+                        value={numConvidados}
+                        onChange={(e) => setNumConvidados(e.target.value)}
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Detalhes do Evento
-                    </label>
-                    <Textarea 
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Detalhes do Evento</label>
+                    <Textarea
                       placeholder="Conte-nos mais sobre seu evento, preferências culinárias, horário, local..."
                       rows={4}
                       className="border-rose-200 focus:border-rose-400 focus:ring-rose-400"
+                      value={detalhes}
+                      onChange={(e) => setDetalhes(e.target.value)}
                     />
                   </div>
 
-                  <Button 
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Possui alguma alergia?</label>
+                    <div className="flex items-center gap-6">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="alergia"
+                          value="não"
+                          checked={temAlergia === "não"}
+                          onChange={() => setTemAlergia("não")}
+                          className="text-rose-600 focus:ring-rose-500"
+                        />
+                        <span>Não</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="alergia"
+                          value="sim"
+                          checked={temAlergia === "sim"}
+                          onChange={() => setTemAlergia("sim")}
+                          className="text-rose-600 focus:ring-rose-500"
+                        />
+                        <span>Sim</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {temAlergia === "sim" && (
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Quais alergias devemos considerar?</label>
+                      <Textarea
+                        placeholder="Ex: Glúten, leite e derivados, camarão..."
+                        rows={4}
+                        className="border-rose-200 focus:border-rose-400 focus:ring-rose-400"
+                        value={alergias}
+                        onChange={(e) => setAlergias(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  <Button
                     type="submit"
                     className="w-full bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white py-4"
                   >

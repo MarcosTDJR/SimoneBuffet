@@ -97,7 +97,7 @@ export function Footer() {
         <div className="border-t border-gray-700 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-gray-400">
-              © 2024 Buffet Simone. Todos os direitos reservados.
+              © 2025 Buffet Simone. Todos os direitos reservados.
             </p>
             <div className="flex items-center gap-2 text-sm text-gray-400">
               <span>Feito com</span>

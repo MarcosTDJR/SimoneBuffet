@@ -60,10 +60,6 @@ export function AboutSection() {
           {/* Conteúdo textual */}
           <div className="space-y-8">
             <div>
-              <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full text-rose-600 text-sm border border-rose-200 mb-6">
-                <span>👩‍🍳</span>
-                <span>Nossa História</span>
-              </div>
               
               <h2 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-6">
                 Conheça a <span className="text-transparent bg-gradient-to-r from-rose-500 to-rose-700 bg-clip-text">Simone</span>

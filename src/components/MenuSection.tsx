@@ -119,10 +119,6 @@ export function MenuSection() {
       <div className="container mx-auto px-4">
         {/* Header da seção */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-rose-100 px-4 py-2 rounded-full text-rose-600 text-sm mb-4">
-            <span>🍽️</span>
-            <span>Nosso Cardápio</span>
-          </div>
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-4">
             Sabores que{" "}
             <span className="text-transparent bg-gradient-to-r from-rose-500 to-rose-700 bg-clip-text">

@@ -10,13 +10,17 @@ export function HeroSection() {
     }
   };
 
+  const scrollToContato = () => {
+    const element = document.getElementById('contato');
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section id="inicio" className="min-h-screen bg-gradient-to-br from-rose-50 via-beige-50 to-rose-100 relative overflow-hidden">
       {/* Decorative elements */}
-      <div className="absolute top-20 left-10 w-20 h-20 bg-rose-200 rounded-full opacity-60 animate-pulse"></div>
       <div className="absolute bottom-20 right-10 w-16 h-16 bg-beige-300 rounded-full opacity-50 animate-pulse"></div>
-      <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-rose-300 rounded-full opacity-40"></div>
-
       <div className="container mx-auto px-4 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[80vh]">
           {/* Conteúdo textual */}
@@ -74,10 +78,9 @@ export function HeroSection() {
                 Ver Cardápio
               </Button>
               <Button
-                variant="outline"
+                onClick={scrollToContato}
                 size="lg"
-                className="border-rose-300 text-rose-600 hover:bg-rose-50 px-8 py-4"
-              >
+                className="bg-white text-rose-600 border border-rose-300 hover:bg-rose-100 px-8 py-4"              >
                 Solicitar Orçamento
               </Button>
             </div>
