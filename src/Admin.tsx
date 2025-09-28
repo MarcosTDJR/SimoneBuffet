@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import styles from "./Admin.module.css";
+import "./Admin.css";
 import { db } from "./firebaseConfig";
 import {
   collection,
@@ -9,9 +9,17 @@ import {
   updateDoc,
   deleteDoc,
 } from "firebase/firestore";
-import { ImagePlus } from "lucide-react";
 
-// Tipos
+import AdminHome from "./components/admin/Home/AdminHome";
+import Login from "./components/admin/Login/Login";
+import AdminMenu from "./components/admin/Menu/AdminMenu";
+import AdminPhotos from "./components/admin/Photos/AdminPhotos";
+
+const homeIcon = "/src/Icons/home-black.png";
+const cardapioIcon = "/src/Icons/cardapio-black.png";
+const categoriaIcon = "/src/Icons/categoria-black.png";
+const galeriaIcon = "/src/Icons/galeria-black.png";
+
 interface Prato {
   id: string;
   nome: string;
@@ -26,45 +34,17 @@ interface Categoria {
 }
 
 const Admin: React.FC = () => {
+  // Estados principais (reduzidos - apenas o essencial)
   const [logado, setLogado] = useState<boolean>(false);
-  const [credenciais, setCredenciais] = useState<{
-    usuario: string;
-    senha: string;
-  }>({
-    usuario: "",
-    senha: "",
-  });
+  const [pagina, setPagina] = useState<"inicio" | "cardapio" | "fotos" | "categorias">("inicio");
 
-  const [pagina, setPagina] = useState<
-    "inicio" | "cardapio" | "fotos" | "categorias"
-  >("inicio");
-
+  // Estados dos dados (mantidos para Firebase)
   const [pratos, setPratos] = useState<Prato[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
-  const [novoPrato, setNovoPrato] = useState<{
-    nome: string;
-    preco: string;
-    categoriaId: string;
-  }>({
-    nome: "",
-    preco: "",
-    categoriaId: "",
-  });
-  const [novaCategoria, setNovaCategoria] = useState<{
-    nome: string;
-    descricao: string;
-  }>({
-    nome: "",
-    descricao: "",
-  });
-
-  const [editandoCategoriaId, setEditandoCategoriaId] = useState<string | null>(
-    null
-  );
-
+  
+  // Estados para dashboard
   const [fotos, setFotos] = useState<number>(40);
   const [eventos, setEventos] = useState<number>(65);
-
   const [atividades] = useState<string[]>([
     "Novo Salgado Adicionado: Coxinha Recheada com Calabresa.",
     'Imagem "Salão Principal" adicionada a sessão "Ambiente".',
@@ -72,9 +52,17 @@ const Admin: React.FC = () => {
     'A Bebida "Refrigerante 2L" foi excluída e não será mais exibida.',
   ]);
 
-  const [preview, setPreview] = useState<string | null>(null);
+  // Estados para categorias (mantidos para Firebase)
+  const [novaCategoria, setNovaCategoria] = useState<{
+    nome: string;
+    descricao: string;
+  }>({
+    nome: "",
+    descricao: "",
+  });
+  const [editandoCategoriaId, setEditandoCategoriaId] = useState<string | null>(null);
 
-  // Carregar pratos
+  // useEffects do Firebase (mantidos)
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "pratos"), (snapshot) => {
       const lista: Prato[] = snapshot.docs.map((doc) => ({
@@ -86,7 +74,6 @@ const Admin: React.FC = () => {
     return () => unsub();
   }, []);
 
-  // Carregar categorias
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "categorias"), (snapshot) => {
       const lista: Categoria[] = snapshot.docs.map((doc) => ({
@@ -98,15 +85,14 @@ const Admin: React.FC = () => {
     return () => unsub();
   }, []);
 
-  // Verificar login
   useEffect(() => {
     const adminLogado = localStorage.getItem("adminLogado");
     if (adminLogado === "true") setLogado(true);
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (credenciais.usuario === "Admin" && credenciais.senha === "12345678") {
+  // Funções principais (simplificadas)
+  const handleLogin = (usuario: string, senha: string) => {
+    if (usuario === "Admin" && senha === "12345678") {
       setLogado(true);
       localStorage.setItem("adminLogado", "true");
     } else {
@@ -119,24 +105,24 @@ const Admin: React.FC = () => {
     localStorage.removeItem("adminLogado");
   };
 
-  // Adicionar prato
-  const adicionarPrato = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!novoPrato.nome || !novoPrato.preco || !novoPrato.categoriaId) {
-      alert("Preencha todos os campos!");
-      return;
-    }
+  // Função para adicionar prato (para AdminMenu)
+  const handleAddPrato = async (novoPrato: { nome: string; preco: number; categoriaId: string }) => {
     try {
-      await addDoc(collection(db, "pratos"), {
-        nome: novoPrato.nome,
-        preco: parseFloat(novoPrato.preco),
-        categoriaId: novoPrato.categoriaId,
-      });
-      setNovoPrato({ nome: "", preco: "", categoriaId: "" });
-      alert("✅ Prato adicionado com sucesso!");
+      await addDoc(collection(db, "pratos"), novoPrato);
     } catch (error) {
       console.error("Erro ao adicionar prato:", error);
+      throw error;
     }
+  };
+
+  // Função para gerenciar fotos (para AdminPhotos)
+  const handleFotosChange = (novoTotal: number) => {
+    setFotos(novoTotal);
+  };
+
+  // Função de navegação (para AdminHome)
+  const handleNavigateTo = (page: "cardapio" | "categorias" | "fotos") => {
+    setPagina(page);
   };
 
   // Adicionar nova categoria
@@ -161,11 +147,7 @@ const Admin: React.FC = () => {
   // Salvar categoria editada
   const salvarCategoriaEditada = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (
-      !novaCategoria.nome ||
-      !novaCategoria.descricao ||
-      !editandoCategoriaId
-    ) {
+    if (!novaCategoria.nome || !novaCategoria.descricao || !editandoCategoriaId) {
       alert("Preencha todos os campos!");
       return;
     }
@@ -188,7 +170,6 @@ const Admin: React.FC = () => {
       try {
         await deleteDoc(doc(db, "categorias", id));
         alert("❌ Categoria excluída com sucesso!");
-        // Limpar edição se estiver editando a mesma categoria
         if (editandoCategoriaId === id) {
           setNovaCategoria({ nome: "", descricao: "" });
           setEditandoCategoriaId(null);
@@ -198,125 +179,105 @@ const Admin: React.FC = () => {
       }
     }
   };
+
+  // SE NÃO LOGADO, USAR COMPONENTE LOGIN
   if (!logado) {
-    return (
-      <div className={styles.florp}>
-        <div className={styles.zigzag}>
-          <h1>🔑 Área Administrativa</h1>
-          <p>Faça login para gerenciar seus produtos</p>
-          <form onSubmit={handleLogin}>
-            <input
-              type="text"
-              placeholder="Usuário"
-              value={credenciais.usuario}
-              onChange={(e) =>
-                setCredenciais({ ...credenciais, usuario: e.target.value })
-              }
-            />
-            <input
-              type="password"
-              placeholder="Senha"
-              value={credenciais.senha}
-              onChange={(e) =>
-                setCredenciais({ ...credenciais, senha: e.target.value })
-              }
-            />
-            <button type="submit">Entrar</button>
-          </form>
-        </div>
-      </div>
-    );
+    return <Login onLogin={handleLogin} />;
   }
 
-  return (
-    <div className={styles.bloop}>
-      <header className={styles.snarp}>
-        <div className={styles.wobble}>
-          <h1>🍽 Buffet Simone</h1>
-          <nav>
-            <button
-              className={pagina === "inicio" ? styles.sproing : ""}
-              onClick={() => setPagina("inicio")}
-            >
-              Início
-            </button>
-            <button
-              className={pagina === "cardapio" ? styles.sproing : ""}
-              onClick={() => setPagina("cardapio")}
-            >
-              Cardápio
-            </button>
-            <button
-              className={pagina === "categorias" ? styles.sproing : ""}
-              onClick={() => setPagina("categorias")}
-            >
-              Categorias
-            </button>
-            <button
-              className={pagina === "fotos" ? styles.sproing : ""}
-              onClick={() => setPagina("fotos")}
-            >
-              Fotos
-            </button>
-          </nav>
+return (
+  <div className="admin-layout">
+    <header className="header-top">
+      <div className="header-brand">
+        <div className="icon-container">
+          <img src="./src/Icons/garfo-faca.png" alt="Buffet Simone" />
         </div>
-        <button onClick={handleLogout} className={styles.zap}>
+        <div className="header-brand-text">
+          <h1>Buffet Simone</h1>
+          <p>Painel Administrativo</p>
+        </div>
+      </div>
+      
+      <div className="header-user">
+        <img 
+          src="./src/Icons/usuario.png" 
+          alt="Avatar" 
+          className="user-avatar"
+        />
+      <span className="user-name">Simone</span>
+    </div>
+    </header>
+
+      <header className="main-navbar">
+        <div className="nav-container">
+<nav>
+  <button
+    className={pagina === "inicio" ? "nav-active" : ""}
+    onClick={() => setPagina("inicio")}
+  >
+    <img src={homeIcon} alt="" />
+    Início
+  </button>
+  <button
+    className={pagina === "cardapio" ? "nav-active" : ""}
+    onClick={() => setPagina("cardapio")}
+  >
+    <img src={cardapioIcon} alt="" />
+    Cardápio
+  </button>
+  <button
+    className={pagina === "categorias" ? "nav-active" : ""}
+    onClick={() => setPagina("categorias")}
+  >
+    <img src={categoriaIcon} alt="" />
+    Categorias
+  </button>
+  <button
+    className={pagina === "fotos" ? "nav-active" : ""}
+    onClick={() => setPagina("fotos")}
+  >
+    <img src={galeriaIcon} alt="" />
+    Fotos
+  </button>
+</nav>
+        </div>
+        <button onClick={handleLogout} className="logout-button">
           Sair
         </button>
       </header>
 
       {pagina === "inicio" && (
-        <>
-          <section className={styles.plop}>
-            <div className={styles.glop}>
-              <h3>Pratos no Cardápio</h3>
-              <p>{pratos.length}</p>
-            </div>
-            <div className={styles.glop}>
-              <h3>Categorias Criadas</h3>
-              <p>{categorias.length}</p>
-            </div>
-            <div className={styles.glop}>
-              <h3>Fotos Adicionadas</h3>
-              <p>{fotos}</p>
-            </div>
-            <div className={styles.glop}>
-              <h3>Eventos Realizados</h3>
-              <p>{eventos}</p>
-            </div>
-          </section>
+        <AdminHome
+          pratos={pratos.length}
+          categorias={categorias.length}
+          fotos={fotos}
+          eventos={eventos}
+          atividades={atividades}
+          onNavigateTo={handleNavigateTo}
+        />
+      )}
 
-          <section className={styles.blop}>
-            <h2>Atividades Recentes</h2>
-            <ul>
-              {atividades.map((a, i) => (
-                <li key={i}>• {a}</li>
-              ))}
-            </ul>
-          </section>
+      {pagina === "cardapio" && (
+        <AdminMenu
+          pratos={pratos}
+          categorias={categorias}
+          onAddPrato={handleAddPrato}
+        />
+      )}
 
-          <section className={styles.sploosh}>
-            <button onClick={() => setPagina("cardapio")}>
-              ➕ Adicionar Novo Prato
-            </button>
-            <button onClick={() => setPagina("categorias")}>
-              📂 Criar Nova Categoria
-            </button>
-            <button onClick={() => setPagina("fotos")}>
-              🖼 Adicionar Nova Imagem
-            </button>
-          </section>
-        </>
+      {pagina === "fotos" && (
+        <AdminPhotos
+          fotos={fotos}
+          onFotosChange={handleFotosChange}
+        />
       )}
 
       {pagina === "categorias" && (
-        <div className={styles.froob}>
+        <div className="categories-container">
           <h2>📂 Categorias</h2>
           <form
-            onSubmit={
-              editandoCategoriaId ? salvarCategoriaEditada : adicionarCategoria
-            }
-            className={styles.swoosh}
+            onSubmit={editandoCategoriaId ? salvarCategoriaEditada : adicionarCategoria}
+            className="category-form"
           >
             <input
               type="text"
@@ -382,117 +343,6 @@ const Admin: React.FC = () => {
           </ul>
         </div>
       )}
-
-      {pagina === "cardapio" && (
-        <div className={styles.froob2}>
-          <h2>📋 Cardápio</h2>
-          <form onSubmit={adicionarPrato} className={styles.swoosh2}>
-            <input
-              type="text"
-              placeholder="Nome do prato"
-              value={novoPrato.nome}
-              onChange={(e) =>
-                setNovoPrato({ ...novoPrato, nome: e.target.value })
-              }
-            />
-            <input
-              type="number"
-              step="0.01"
-              placeholder="Preço"
-              value={novoPrato.preco}
-              onChange={(e) =>
-                setNovoPrato({ ...novoPrato, preco: e.target.value })
-              }
-            />
-            <select
-              value={novoPrato.categoriaId}
-              onChange={(e) =>
-                setNovoPrato({ ...novoPrato, categoriaId: e.target.value })
-              }
-            >
-              <option value="">Selecione uma categoria</option>
-              {categorias.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nome}
-                </option>
-              ))}
-            </select>
-            <button type="submit">Salvar Prato</button>
-          </form>
-
-          <ul>
-            {pratos.map((p) => {
-              const categoria = categorias.find((c) => c.id === p.categoriaId);
-              return (
-                <li key={p.id}>
-                  🍴 {p.nome} - R$ {p.preco.toFixed(2)}{" "}
-                  {categoria && <span>({categoria.nome})</span>}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-
-{pagina === "fotos" && (
-  <div className={styles.froob3}>
- 
-    <div className={styles.conteinerphoto1}>
-      <h2>
-        Gerenciar <span>Fotos</span>
-      </h2>
-      <p>Adicione e organize as fotos do seu buffet</p>
-    </div>
-
-
-    <div className={styles.addFoto}>
-      <p className={styles.tituloContainer}>Adicionar Novas Fotos</p>
-      <div className={styles.conteinerCenter}>
-        <div className={styles.boxDrag}>
-          <p>Arraste suas fotos aqui</p>
-          <p>ou clique para selecionar arquivos</p>
-
-         
-          <button
-            type="button"
-            onClick={() => document.getElementById("fileInput")?.click()}
-            className={styles.btnSelecionar}
-          >
-            <ImagePlus />
-            Selecionar Imagem
-          </button>
-
-          <input
-            id="fileInput"
-            type="file"
-            accept="image/*"
-            className={styles.hiddenInput}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                const imageUrl = URL.createObjectURL(file);
-                setPreview(imageUrl);
-              }
-            }}
-          />
-
-        
-          {preview && (
-            <div className={styles.previewContainer}>
-              <p className={styles.previewLabel}>Pré-visualização:</p>
-              <img
-                src={preview}
-                alt="Preview"
-                className={styles.previewImage}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  </div>
-)}
-
     </div>
   );
 };
