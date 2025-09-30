@@ -54,7 +54,7 @@ const AdminMenu: React.FC<AdminMenuProps> = ({
 
   return (
     <div className="menu-container">
-      <h2>📋 Cardápio</h2>
+      <h2> Cardápio</h2>
       
       <form onSubmit={adicionarPrato} className="form-container">
         <input

@@ -274,7 +274,7 @@ return (
 
       {pagina === "categorias" && (
         <div className="categories-container">
-          <h2>📂 Categorias</h2>
+          <h2> Categorias</h2>
           <form
             onSubmit={editandoCategoriaId ? salvarCategoriaEditada : adicionarCategoria}
             className="category-form"

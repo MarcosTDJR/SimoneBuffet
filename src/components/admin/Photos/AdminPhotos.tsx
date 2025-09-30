@@ -35,13 +35,13 @@ const AdminPhotos: React.FC<AdminPhotosProps> = ({
   const handleRemovePhoto = () => {
     if (fotos > 0) {
       onFotosChange(fotos - 1);
-      alert("🗑️ Foto removida!");
+      alert(" Foto removida!");
     }
   };
 
   return (
     <div className="photos-container">
-      <h2>📷 Gerenciamento de Fotos</h2>
+      <h2> Gerenciamento de Fotos</h2>
 
       <section className="photos-stats">
         <div className="stat-card">
@@ -62,7 +62,7 @@ const AdminPhotos: React.FC<AdminPhotosProps> = ({
 
 
       <section className="upload-section">
-        <h3>📤 Upload de Nova Foto</h3>
+        <h3> Upload de Nova Foto</h3>
         <div className="upload-area">
           <input
             type="file"
@@ -74,9 +74,9 @@ const AdminPhotos: React.FC<AdminPhotosProps> = ({
           />
           <label htmlFor="photo-upload" className={`upload-label ${uploading ? 'uploading' : ''}`}>
             {uploading ? (
-              <>🔄 Fazendo upload...</>
+              <> Fazendo upload...</>
             ) : (
-              <>📷 Clique ou arraste uma foto aqui</>
+              <> Clique ou arraste uma foto aqui</>
             )}
           </label>
         </div>
@@ -91,7 +91,7 @@ const AdminPhotos: React.FC<AdminPhotosProps> = ({
 
       <section className="gallery-section">
         <div className="gallery-header">
-          <h3>🖼️ Galeria de Fotos</h3>
+          <h3> Galeria de Fotos</h3>
           <button 
             onClick={handleRemovePhoto} 
             className="remove-btn"
@@ -103,7 +103,7 @@ const AdminPhotos: React.FC<AdminPhotosProps> = ({
 
         {fotos === 0 ? (
           <div className="empty-gallery">
-            <p>📷 Nenhuma foto adicionada ainda</p>
+            <p> Nenhuma foto adicionada ainda</p>
             <small>Use o upload acima para adicionar a primeira foto</small>
           </div>
         ) : (
@@ -127,28 +127,6 @@ const AdminPhotos: React.FC<AdminPhotosProps> = ({
             )}
           </div>
         )}
-      </section>
-
-      <section className="future-features">
-        <h3>🚧 Próximas Funcionalidades:</h3>
-        <div className="feature-buttons">
-          <button className="feature-btn" disabled>
-            📂 Gerenciar Categorias (Modal 1)
-          </button>
-          <button className="feature-btn" disabled>
-            🏷️ Adicionar Tags (Modal 2)
-          </button>
-          <button className="feature-btn" disabled>
-            📊 Relatórios de Fotos (Modal 3)
-          </button>
-          <button className="feature-btn" disabled>
-            ⚙️ Configurações de Galeria (Modal 4)
-          </button>
-        </div>
-        <p className="dev-note">
-          💡 <strong>Para o desenvolvedor:</strong> Esta seção gerencia as fotos que aparecerão na landing page.
-          Integre com Firebase Storage para upload real e crie modais para categorização das imagens!
-        </p>
       </section>
     </div>
   );
