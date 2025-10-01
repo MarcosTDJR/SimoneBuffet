@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./MenuModules.css"; 
+import "./MenuModules.css";
 
 interface Prato {
   id: string;
@@ -18,12 +18,14 @@ interface AdminMenuProps {
   pratos: Prato[];
   categorias: Categoria[];
   onAddPrato: (prato: { nome: string; preco: number; categoriaId: string }) => void;
+  onDeletePrato: (id: string) => void; // ✅ nova prop
 }
 
 const AdminMenu: React.FC<AdminMenuProps> = ({
   pratos,
   categorias,
   onAddPrato,
+  onDeletePrato, // ✅ recebe aqui
 }) => {
   const [novoPrato, setNovoPrato] = useState<{
     nome: string;
@@ -55,7 +57,7 @@ const AdminMenu: React.FC<AdminMenuProps> = ({
   return (
     <div className="menu-container">
       <h2> Cardápio</h2>
-      
+
       <form onSubmit={adicionarPrato} className="form-container">
         <input
           type="text"
@@ -102,6 +104,16 @@ const AdminMenu: React.FC<AdminMenuProps> = ({
                 <li key={p.id} className="prato-item">
                   🍴 {p.nome} - R$ {p.preco.toFixed(2)}{" "}
                   {categoria && <span className="categoria-badge">({categoria.nome})</span>}
+                  <button
+                    className="delete-btn"
+                    onClick={() => {
+                      if (window.confirm(`Excluir prato "${p.nome}"?`)) {
+                        onDeletePrato(p.id); // ✅ chama a função do pai
+                      }
+                    }}
+                  >
+                    ❌ Excluir
+                  </button>
                 </li>
               );
             })}
