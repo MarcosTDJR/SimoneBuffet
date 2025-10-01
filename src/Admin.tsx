@@ -115,6 +115,32 @@ const Admin: React.FC = () => {
     }
   };
 
+  // Função para excluir prato
+  const handleDeletePrato = async (id: string) => {
+    if (window.confirm("Tem certeza que deseja excluir este prato?")) {
+      try {
+        await deleteDoc(doc(db, "pratos", id));
+        alert("❌ Prato excluído com sucesso!");
+      } catch (error) {
+        console.error("Erro ao excluir prato:", error);
+        alert("Erro ao excluir prato!");
+      }
+    }
+  };
+
+  // Função para editar prato
+  const handleEditPrato = async (id: string, pratoAtualizado: { nome: string; preco: number; categoriaId: string }) => {
+    try {
+      const pratoRef = doc(db, "pratos", id);
+      await updateDoc(pratoRef, pratoAtualizado);
+      alert("✏️ Prato atualizado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao editar prato:", error);
+      alert("Erro ao editar prato!");
+    }
+  };
+
+
   // Função para gerenciar fotos (para AdminPhotos)
   const handleFotosChange = (novoTotal: number) => {
     setFotos(novoTotal);
@@ -262,19 +288,11 @@ const Admin: React.FC = () => {
           pratos={pratos}
           categorias={categorias}
           onAddPrato={handleAddPrato}
-          onDeletePrato={async (id: string) => {
-            if (window.confirm("Tem certeza que deseja excluir este prato?")) {
-              try {
-                await deleteDoc(doc(db, "pratos", id));
-                alert("❌ Prato excluído com sucesso!");
-              } catch (error) {
-                console.error("Erro ao excluir prato:", error);
-                alert("Erro ao excluir prato!");
-              }
-            }
-          }}
+          onDeletePrato={handleDeletePrato}
+          onEditPrato={handleEditPrato}
         />
       )}
+
 
 
       {pagina === "fotos" && (
