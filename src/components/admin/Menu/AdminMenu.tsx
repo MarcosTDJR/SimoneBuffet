@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./MenuModules.css"; 
+import "./MenuModules.css";
 
 interface Prato {
   id: string;
@@ -18,18 +18,26 @@ interface AdminMenuProps {
   pratos: Prato[];
   categorias: Categoria[];
   onAddPrato: (prato: { nome: string; preco: number; categoriaId: string }) => void;
+  onDeletePrato: (id: string) => void;
+  onEditPrato: (id: string, prato: { nome: string; preco: number; categoriaId: string }) => void;
 }
 
 const AdminMenu: React.FC<AdminMenuProps> = ({
   pratos,
   categorias,
   onAddPrato,
+  onDeletePrato,
+  onEditPrato,
 }) => {
-  const [novoPrato, setNovoPrato] = useState<{
-    nome: string;
-    preco: string;
-    categoriaId: string;
-  }>({
+  const [novoPrato, setNovoPrato] = useState<{ nome: string; preco: string; categoriaId: string }>({
+    nome: "",
+    preco: "",
+    categoriaId: "",
+  });
+
+  // estado para edição
+  const [editandoPratoId, setEditandoPratoId] = useState<string | null>(null);
+  const [pratoEditado, setPratoEditado] = useState<{ nome: string; preco: string; categoriaId: string }>({
     nome: "",
     preco: "",
     categoriaId: "",
@@ -41,44 +49,52 @@ const AdminMenu: React.FC<AdminMenuProps> = ({
       alert("Preencha todos os campos!");
       return;
     }
-
     await onAddPrato({
       nome: novoPrato.nome,
       preco: parseFloat(novoPrato.preco),
       categoriaId: novoPrato.categoriaId,
     });
-
     setNovoPrato({ nome: "", preco: "", categoriaId: "" });
     alert("✅ Prato adicionado com sucesso!");
   };
 
+  const salvarEdicao = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editandoPratoId || !pratoEditado.nome || !pratoEditado.preco || !pratoEditado.categoriaId) {
+      alert("Preencha todos os campos!");
+      return;
+    }
+    await onEditPrato(editandoPratoId, {
+      nome: pratoEditado.nome,
+      preco: parseFloat(pratoEditado.preco),
+      categoriaId: pratoEditado.categoriaId,
+    });
+    setEditandoPratoId(null);
+    setPratoEditado({ nome: "", preco: "", categoriaId: "" });
+  };
+
   return (
     <div className="menu-container">
-      <h2>📋 Cardápio</h2>
-      
+      <h2> Cardápio</h2>
+
+      {/* Formulário de adicionar prato */}
       <form onSubmit={adicionarPrato} className="form-container">
         <input
           type="text"
           placeholder="Nome do prato"
           value={novoPrato.nome}
-          onChange={(e) =>
-            setNovoPrato({ ...novoPrato, nome: e.target.value })
-          }
+          onChange={(e) => setNovoPrato({ ...novoPrato, nome: e.target.value })}
         />
         <input
           type="number"
           step="0.01"
           placeholder="Preço"
           value={novoPrato.preco}
-          onChange={(e) =>
-            setNovoPrato({ ...novoPrato, preco: e.target.value })
-          }
+          onChange={(e) => setNovoPrato({ ...novoPrato, preco: e.target.value })}
         />
         <select
           value={novoPrato.categoriaId}
-          onChange={(e) =>
-            setNovoPrato({ ...novoPrato, categoriaId: e.target.value })
-          }
+          onChange={(e) => setNovoPrato({ ...novoPrato, categoriaId: e.target.value })}
         >
           <option value="">Selecione uma categoria</option>
           {categorias.map((c) => (
@@ -100,8 +116,55 @@ const AdminMenu: React.FC<AdminMenuProps> = ({
               const categoria = categorias.find((c) => c.id === p.categoriaId);
               return (
                 <li key={p.id} className="prato-item">
-                  🍴 {p.nome} - R$ {p.preco.toFixed(2)}{" "}
-                  {categoria && <span className="categoria-badge">({categoria.nome})</span>}
+                  {editandoPratoId === p.id ? (
+                    <form onSubmit={salvarEdicao} className="form-edit">
+                      <input
+                        type="text"
+                        value={pratoEditado.nome}
+                        onChange={(e) => setPratoEditado({ ...pratoEditado, nome: e.target.value })}
+                      />
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={pratoEditado.preco}
+                        onChange={(e) => setPratoEditado({ ...pratoEditado, preco: e.target.value })}
+                      />
+                      <select
+                        value={pratoEditado.categoriaId}
+                        onChange={(e) => setPratoEditado({ ...pratoEditado, categoriaId: e.target.value })}
+                      >
+                        <option value="">Selecione uma categoria</option>
+                        {categorias.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.nome}
+                          </option>
+                        ))}
+                      </select>
+                      <button type="submit">Salvar</button>
+                      <button type="button" onClick={() => setEditandoPratoId(null)}>Cancelar</button>
+                    </form>
+                  ) : (
+                    <>
+                      🍴 {p.nome} - R$ {p.preco.toFixed(2)}{" "}
+                      {categoria && <span className="categoria-badge">({categoria.nome})</span>}
+                      <button
+                        className="edit-btn"
+                        onClick={() => {
+                          setEditandoPratoId(p.id);
+                          setPratoEditado({
+                            nome: p.nome,
+                            preco: p.preco.toString(),
+                            categoriaId: p.categoriaId || "",
+                          });
+                        }}
+                      >
+                        ✏️ Editar
+                      </button>
+                      <button className="delete-btn" onClick={() => onDeletePrato(p.id)}>
+                        ❌ Excluir
+                      </button>
+                    </>
+                  )}
                 </li>
               );
             })}

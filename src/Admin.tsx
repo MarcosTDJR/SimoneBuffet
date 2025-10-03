@@ -41,7 +41,7 @@ const Admin: React.FC = () => {
   // Estados dos dados (mantidos para Firebase)
   const [pratos, setPratos] = useState<Prato[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
-  
+
   // Estados para dashboard
   const [fotos, setFotos] = useState<number>(40);
   const [eventos, setEventos] = useState<number>(65);
@@ -115,6 +115,32 @@ const Admin: React.FC = () => {
     }
   };
 
+  // Função para excluir prato
+  const handleDeletePrato = async (id: string) => {
+    if (window.confirm("Tem certeza que deseja excluir este prato?")) {
+      try {
+        await deleteDoc(doc(db, "pratos", id));
+        alert("❌ Prato excluído com sucesso!");
+      } catch (error) {
+        console.error("Erro ao excluir prato:", error);
+        alert("Erro ao excluir prato!");
+      }
+    }
+  };
+
+  // Função para editar prato
+  const handleEditPrato = async (id: string, pratoAtualizado: { nome: string; preco: number; categoriaId: string }) => {
+    try {
+      const pratoRef = doc(db, "pratos", id);
+      await updateDoc(pratoRef, pratoAtualizado);
+      alert("✏️ Prato atualizado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao editar prato:", error);
+      alert("Erro ao editar prato!");
+    }
+  };
+
+
   // Função para gerenciar fotos (para AdminPhotos)
   const handleFotosChange = (novoTotal: number) => {
     setFotos(novoTotal);
@@ -185,61 +211,61 @@ const Admin: React.FC = () => {
     return <Login onLogin={handleLogin} />;
   }
 
-return (
-  <div className="admin-layout">
-    <header className="header-top">
-      <div className="header-brand">
-        <div className="icon-container">
-          <img src="./src/Icons/garfo-faca.png" alt="Buffet Simone" />
+  return (
+    <div className="admin-layout">
+      <header className="header-top">
+        <div className="header-brand">
+          <div className="icon-container">
+            <img src="./src/Icons/garfo-faca.png" alt="Buffet Simone" />
+          </div>
+          <div className="header-brand-text">
+            <h1>Buffet Simone</h1>
+            <p>Painel Administrativo</p>
+          </div>
         </div>
-        <div className="header-brand-text">
-          <h1>Buffet Simone</h1>
-          <p>Painel Administrativo</p>
+
+        <div className="header-user">
+          <img
+            src="./src/Icons/usuario.png"
+            alt="Avatar"
+            className="user-avatar"
+          />
+          <span className="user-name">Simone</span>
         </div>
-      </div>
-      
-      <div className="header-user">
-        <img 
-          src="./src/Icons/usuario.png" 
-          alt="Avatar" 
-          className="user-avatar"
-        />
-      <span className="user-name">Simone</span>
-    </div>
-    </header>
+      </header>
 
       <header className="main-navbar">
         <div className="nav-container">
-<nav>
-  <button
-    className={pagina === "inicio" ? "nav-active" : ""}
-    onClick={() => setPagina("inicio")}
-  >
-    <img src={homeIcon} alt="" />
-    Início
-  </button>
-  <button
-    className={pagina === "cardapio" ? "nav-active" : ""}
-    onClick={() => setPagina("cardapio")}
-  >
-    <img src={cardapioIcon} alt="" />
-    Cardápio
-  </button>
-  <button
-    className={pagina === "categorias" ? "nav-active" : ""}
-    onClick={() => setPagina("categorias")}
-  >
-    <img src={categoriaIcon} alt="" />
-    Categorias
-  </button>
-  <button
-    className={pagina === "fotos" ? "nav-active" : ""}
-    onClick={() => setPagina("fotos")}
-  >
-    <img src={galeriaIcon} alt="" />
-    Fotos
-  </button>
-</nav>
+          <nav>
+            <button
+              className={pagina === "inicio" ? "nav-active" : ""}
+              onClick={() => setPagina("inicio")}
+            >
+              <img src={homeIcon} alt="" />
+              Início
+            </button>
+            <button
+              className={pagina === "cardapio" ? "nav-active" : ""}
+              onClick={() => setPagina("cardapio")}
+            >
+              <img src={cardapioIcon} alt="" />
+              Cardápio
+            </button>
+            <button
+              className={pagina === "categorias" ? "nav-active" : ""}
+              onClick={() => setPagina("categorias")}
+            >
+              <img src={categoriaIcon} alt="" />
+              Categorias
+            </button>
+            <button
+              className={pagina === "fotos" ? "nav-active" : ""}
+              onClick={() => setPagina("fotos")}
+            >
+              <img src={galeriaIcon} alt="" />
+              Fotos
+            </button>
+          </nav>
         </div>
         <button onClick={handleLogout} className="logout-button">
           Sair
@@ -262,8 +288,12 @@ return (
           pratos={pratos}
           categorias={categorias}
           onAddPrato={handleAddPrato}
+          onDeletePrato={handleDeletePrato}
+          onEditPrato={handleEditPrato}
         />
       )}
+
+
 
       {pagina === "fotos" && (
         <AdminPhotos
@@ -274,7 +304,7 @@ return (
 
       {pagina === "categorias" && (
         <div className="categories-container">
-          <h2>📂 Categorias</h2>
+          <h2> Categorias</h2>
           <form
             onSubmit={editandoCategoriaId ? salvarCategoriaEditada : adicionarCategoria}
             className="category-form"

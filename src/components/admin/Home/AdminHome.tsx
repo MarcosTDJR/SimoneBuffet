@@ -26,11 +26,13 @@ const AdminHome: React.FC<AdminHomeProps> = ({
   onNavigateTo,
 }) => {
 return (
-  <div className="navbar"> 
-    <div className="welcome-card">
-      <h2>Bem-vinda, Simone!</h2>
-      <p>Aqui você pode gerenciar seu cardápio e fotos de forma simples e rápida.</p>
-    </div>
+  <div className="navbar">
+    <div className="dashboard-content">
+      
+      <div className="welcome-card">
+        <h2>Bem-vinda, Simone!</h2>
+        <p>Aqui você pode gerenciar seu cardápio e fotos de forma simples e rápida.</p>
+      </div>
     <section className="stats-container">
       <div className="stats-card">
         <div className="stats-card-header">
@@ -112,6 +114,7 @@ return (
       </div>
     </section>
 
+  </div>
   </div>
 );
 };
