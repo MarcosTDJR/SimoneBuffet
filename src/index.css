@@ -2635,6 +2635,7 @@
   @media (hover: hover) {
     .group-hover\:text-rose-600:is(:where(.group):hover *) {
       color: var(--rose-600);
+      cursor: pointer;
     }
   }
 
@@ -3099,6 +3100,7 @@
   @media (hover: hover) {
     .hover\:text-rose-600:hover {
       color: var(--rose-600);
+      cursor: pointer; 
     }
   }
 
