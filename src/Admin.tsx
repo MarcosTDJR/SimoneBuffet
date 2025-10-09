@@ -13,7 +13,7 @@ import {
 import AdminHome from "./components/admin/Home/AdminHome";
 import Login from "./components/admin/Login/Login";
 import AdminMenu from "./components/admin/Menu/AdminMenu";
-import AdminPhotos from "./components/admin/Photos/AdminPhotos";
+import {AdminPhotos} from "./components/admin/Photos/AdminPhotos";
 
 const homeIcon = "/src/Icons/home-black.png";
 const cardapioIcon = "/src/Icons/cardapio-black.png";
@@ -33,17 +33,25 @@ interface Categoria {
   descricao: string;
 }
 
+interface Photo {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  image: string; // Base64
+}
+
 const Admin: React.FC = () => {
-  // Estados principais (reduzidos - apenas o essencial)
+  // Estados principais
   const [logado, setLogado] = useState<boolean>(false);
   const [pagina, setPagina] = useState<"inicio" | "cardapio" | "fotos" | "categorias">("inicio");
 
-  // Estados dos dados (mantidos para Firebase)
+  // Estados para Firebase
   const [pratos, setPratos] = useState<Prato[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
 
   // Estados para dashboard
-  const [fotos, setFotos] = useState<number>(40);
+  const [photos, setPhotos] = useState<Photo[]>([]);
   const [eventos, setEventos] = useState<number>(65);
   const [atividades] = useState<string[]>([
     "Novo Salgado Adicionado: Coxinha Recheada com Calabresa.",
@@ -52,17 +60,14 @@ const Admin: React.FC = () => {
     'A Bebida "Refrigerante 2L" foi excluída e não será mais exibida.',
   ]);
 
-  // Estados para categorias (mantidos para Firebase)
-  const [novaCategoria, setNovaCategoria] = useState<{
-    nome: string;
-    descricao: string;
-  }>({
+  // Estados para categorias
+  const [novaCategoria, setNovaCategoria] = useState<{ nome: string; descricao: string }>({
     nome: "",
     descricao: "",
   });
   const [editandoCategoriaId, setEditandoCategoriaId] = useState<string | null>(null);
 
-  // useEffects do Firebase (mantidos)
+  // Firebase: escuta pratos
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "pratos"), (snapshot) => {
       const lista: Prato[] = snapshot.docs.map((doc) => ({
@@ -74,6 +79,7 @@ const Admin: React.FC = () => {
     return () => unsub();
   }, []);
 
+  // Firebase: escuta categorias
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "categorias"), (snapshot) => {
       const lista: Categoria[] = snapshot.docs.map((doc) => ({
@@ -85,12 +91,24 @@ const Admin: React.FC = () => {
     return () => unsub();
   }, []);
 
+  // LocalStorage: carregar fotos
+  useEffect(() => {
+    const saved = localStorage.getItem("photos");
+    if (saved) setPhotos(JSON.parse(saved));
+  }, []);
+
+  // LocalStorage: salvar fotos sempre que mudar
+  useEffect(() => {
+    localStorage.setItem("photos", JSON.stringify(photos));
+  }, [photos]);
+
+  // Login automático
   useEffect(() => {
     const adminLogado = localStorage.getItem("adminLogado");
     if (adminLogado === "true") setLogado(true);
   }, []);
 
-  // Funções principais (simplificadas)
+  // Funções de login/logout
   const handleLogin = (usuario: string, senha: string) => {
     if (usuario === "Admin" && senha === "12345678") {
       setLogado(true);
@@ -99,13 +117,12 @@ const Admin: React.FC = () => {
       alert("Usuário ou senha incorretos!");
     }
   };
-
   const handleLogout = () => {
     setLogado(false);
     localStorage.removeItem("adminLogado");
   };
 
-  // Função para adicionar prato (para AdminMenu)
+  // Funções para pratos
   const handleAddPrato = async (novoPrato: { nome: string; preco: number; categoriaId: string }) => {
     try {
       await addDoc(collection(db, "pratos"), novoPrato);
@@ -114,8 +131,6 @@ const Admin: React.FC = () => {
       throw error;
     }
   };
-
-  // Função para excluir prato
   const handleDeletePrato = async (id: string) => {
     if (window.confirm("Tem certeza que deseja excluir este prato?")) {
       try {
@@ -127,8 +142,6 @@ const Admin: React.FC = () => {
       }
     }
   };
-
-  // Função para editar prato
   const handleEditPrato = async (id: string, pratoAtualizado: { nome: string; preco: number; categoriaId: string }) => {
     try {
       const pratoRef = doc(db, "pratos", id);
@@ -140,18 +153,12 @@ const Admin: React.FC = () => {
     }
   };
 
-
-  // Função para gerenciar fotos (para AdminPhotos)
-  const handleFotosChange = (novoTotal: number) => {
-    setFotos(novoTotal);
-  };
-
-  // Função de navegação (para AdminHome)
+  // Navegação
   const handleNavigateTo = (page: "cardapio" | "categorias" | "fotos") => {
     setPagina(page);
   };
 
-  // Adicionar nova categoria
+  // Funções de categoria
   const adicionarCategoria = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!novaCategoria.nome || !novaCategoria.descricao) {
@@ -169,8 +176,6 @@ const Admin: React.FC = () => {
       console.error("Erro ao criar categoria:", error);
     }
   };
-
-  // Salvar categoria editada
   const salvarCategoriaEditada = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!novaCategoria.nome || !novaCategoria.descricao || !editandoCategoriaId) {
@@ -190,7 +195,6 @@ const Admin: React.FC = () => {
       console.error("Erro ao editar categoria:", error);
     }
   };
-
   const excluirCategoria = async (id: string) => {
     if (window.confirm("Tem certeza que deseja excluir esta categoria?")) {
       try {
@@ -206,13 +210,12 @@ const Admin: React.FC = () => {
     }
   };
 
-  // SE NÃO LOGADO, USAR COMPONENTE LOGIN
-  if (!logado) {
-    return <Login onLogin={handleLogin} />;
-  }
+  // Se não logado
+  if (!logado) return <Login onLogin={handleLogin} />;
 
   return (
     <div className="admin-layout">
+      {/* HEADER */}
       <header className="header-top">
         <div className="header-brand">
           <div className="icon-container">
@@ -225,58 +228,38 @@ const Admin: React.FC = () => {
         </div>
 
         <div className="header-user">
-          <img
-            src="./src/Icons/usuario.png"
-            alt="Avatar"
-            className="user-avatar"
-          />
+          <img src="./src/Icons/usuario.png" alt="Avatar" className="user-avatar" />
           <span className="user-name">Simone</span>
         </div>
       </header>
 
+      {/* NAVBAR */}
       <header className="main-navbar">
         <div className="nav-container">
           <nav>
-            <button
-              className={pagina === "inicio" ? "nav-active" : ""}
-              onClick={() => setPagina("inicio")}
-            >
-              <img src={homeIcon} alt="" />
-              Início
+            <button className={pagina === "inicio" ? "nav-active" : ""} onClick={() => setPagina("inicio")}>
+              <img src={homeIcon} alt="" /> Início
             </button>
-            <button
-              className={pagina === "cardapio" ? "nav-active" : ""}
-              onClick={() => setPagina("cardapio")}
-            >
-              <img src={cardapioIcon} alt="" />
-              Cardápio
+            <button className={pagina === "cardapio" ? "nav-active" : ""} onClick={() => setPagina("cardapio")}>
+              <img src={cardapioIcon} alt="" /> Cardápio
             </button>
-            <button
-              className={pagina === "categorias" ? "nav-active" : ""}
-              onClick={() => setPagina("categorias")}
-            >
-              <img src={categoriaIcon} alt="" />
-              Categorias
+            <button className={pagina === "categorias" ? "nav-active" : ""} onClick={() => setPagina("categorias")}>
+              <img src={categoriaIcon} alt="" /> Categorias
             </button>
-            <button
-              className={pagina === "fotos" ? "nav-active" : ""}
-              onClick={() => setPagina("fotos")}
-            >
-              <img src={galeriaIcon} alt="" />
-              Fotos
+            <button className={pagina === "fotos" ? "nav-active" : ""} onClick={() => setPagina("fotos")}>
+              <img src={galeriaIcon} alt="" /> Fotos
             </button>
           </nav>
         </div>
-        <button onClick={handleLogout} className="logout-button">
-          Sair
-        </button>
+        <button onClick={handleLogout} className="logout-button">Sair</button>
       </header>
 
+      {/* PÁGINAS */}
       {pagina === "inicio" && (
         <AdminHome
           pratos={pratos.length}
           categorias={categorias.length}
-          fotos={fotos}
+          fotos={photos.length}
           eventos={eventos}
           atividades={atividades}
           onNavigateTo={handleNavigateTo}
@@ -293,18 +276,13 @@ const Admin: React.FC = () => {
         />
       )}
 
-
-
       {pagina === "fotos" && (
-        <AdminPhotos
-          fotos={fotos}
-          onFotosChange={handleFotosChange}
-        />
+        <AdminPhotos photos={photos} setPhotos={setPhotos} />
       )}
 
       {pagina === "categorias" && (
         <div className="categories-container">
-          <h2> Categorias</h2>
+          <h2>Categorias</h2>
           <form
             onSubmit={editandoCategoriaId ? salvarCategoriaEditada : adicionarCategoria}
             className="category-form"
@@ -313,20 +291,13 @@ const Admin: React.FC = () => {
               type="text"
               placeholder="Nome da categoria"
               value={novaCategoria.nome}
-              onChange={(e) =>
-                setNovaCategoria({ ...novaCategoria, nome: e.target.value })
-              }
+              onChange={(e) => setNovaCategoria({ ...novaCategoria, nome: e.target.value })}
             />
             <input
               type="text"
               placeholder="Descrição"
               value={novaCategoria.descricao}
-              onChange={(e) =>
-                setNovaCategoria({
-                  ...novaCategoria,
-                  descricao: e.target.value,
-                })
-              }
+              onChange={(e) => setNovaCategoria({ ...novaCategoria, descricao: e.target.value })}
             />
             <button type="submit">
               {editandoCategoriaId ? "Salvar Alteração" : "Salvar Categoria"}
@@ -336,7 +307,7 @@ const Admin: React.FC = () => {
           <ul>
             {categorias.map((c) => (
               <li key={c.id}>
-                📌 {c.nome} - {c.descricao}{" "}
+                📌 {c.nome} - {c.descricao}
                 <button
                   onClick={() => {
                     setNovaCategoria({ nome: c.nome, descricao: c.descricao });
