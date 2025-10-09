@@ -13,7 +13,7 @@ import {
 import AdminHome from "./components/admin/Home/AdminHome";
 import Login from "./components/admin/Login/Login";
 import AdminMenu from "./components/admin/Menu/AdminMenu";
-import {AdminPhotos} from "./components/admin/Photos/AdminPhotos";
+import { AdminPhotos, Photo, Category } from "./components/admin/Photos/AdminPhotos";
 
 const homeIcon = "/src/Icons/home-black.png";
 const cardapioIcon = "/src/Icons/cardapio-black.png";
@@ -27,32 +27,24 @@ interface Prato {
   categoriaId?: string;
 }
 
+// Você já tem uma interface Categoria no Firestore, mas aqui não necessariamente precisa ser a mesma que o Category para ícone
 interface Categoria {
   id: string;
   nome: string;
   descricao: string;
 }
 
-interface Photo {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  image: string; // Base64
-}
-
 const Admin: React.FC = () => {
-  // Estados principais
   const [logado, setLogado] = useState<boolean>(false);
   const [pagina, setPagina] = useState<"inicio" | "cardapio" | "fotos" | "categorias">("inicio");
 
-  // Estados para Firebase
   const [pratos, setPratos] = useState<Prato[]>([]);
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [categoriasFirestore, setCategoriasFirestore] = useState<Categoria[]>([]);
 
-  // Estados para dashboard
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [eventos, setEventos] = useState<number>(65);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  const [eventos] = useState<number>(65);
   const [atividades] = useState<string[]>([
     "Novo Salgado Adicionado: Coxinha Recheada com Calabresa.",
     'Imagem "Salão Principal" adicionada a sessão "Ambiente".',
@@ -60,47 +52,51 @@ const Admin: React.FC = () => {
     'A Bebida "Refrigerante 2L" foi excluída e não será mais exibida.',
   ]);
 
-  // Estados para categorias
   const [novaCategoria, setNovaCategoria] = useState<{ nome: string; descricao: string }>({
     nome: "",
     descricao: "",
   });
   const [editandoCategoriaId, setEditandoCategoriaId] = useState<string | null>(null);
 
-  // Firebase: escuta pratos
+  // Escuta pratos no Firestore
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "pratos"), (snapshot) => {
-      const lista: Prato[] = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Omit<Prato, "id">),
+      const lista: Prato[] = snapshot.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as Omit<Prato, "id">),
       }));
       setPratos(lista);
     });
     return () => unsub();
   }, []);
 
-  // Firebase: escuta categorias
+  // Escuta categorias no Firestore
   useEffect(() => {
     const unsub = onSnapshot(collection(db, "categorias"), (snapshot) => {
-      const lista: Categoria[] = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Omit<Categoria, "id">),
+      const lista: Categoria[] = snapshot.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as Omit<Categoria, "id">),
       }));
-      setCategorias(lista);
+      setCategoriasFirestore(lista);
     });
     return () => unsub();
   }, []);
 
-  // LocalStorage: carregar fotos
+  // Carregar fotos & categorias locais para AdminPhotos
   useEffect(() => {
-    const saved = localStorage.getItem("photos");
-    if (saved) setPhotos(JSON.parse(saved));
+    const savedPhotos = localStorage.getItem("photos");
+    if (savedPhotos) setPhotos(JSON.parse(savedPhotos));
+    const savedCats = localStorage.getItem("categories");
+    if (savedCats) setCategories(JSON.parse(savedCats));
   }, []);
 
-  // LocalStorage: salvar fotos sempre que mudar
+  // Salvar fotos/local categorias no localStorage
   useEffect(() => {
     localStorage.setItem("photos", JSON.stringify(photos));
   }, [photos]);
+  useEffect(() => {
+    localStorage.setItem("categories", JSON.stringify(categories));
+  }, [categories]);
 
   // Login automático
   useEffect(() => {
@@ -108,7 +104,6 @@ const Admin: React.FC = () => {
     if (adminLogado === "true") setLogado(true);
   }, []);
 
-  // Funções de login/logout
   const handleLogin = (usuario: string, senha: string) => {
     if (usuario === "Admin" && senha === "12345678") {
       setLogado(true);
@@ -122,7 +117,6 @@ const Admin: React.FC = () => {
     localStorage.removeItem("adminLogado");
   };
 
-  // Funções para pratos
   const handleAddPrato = async (novoPrato: { nome: string; preco: number; categoriaId: string }) => {
     try {
       await addDoc(collection(db, "pratos"), novoPrato);
@@ -153,12 +147,6 @@ const Admin: React.FC = () => {
     }
   };
 
-  // Navegação
-  const handleNavigateTo = (page: "cardapio" | "categorias" | "fotos") => {
-    setPagina(page);
-  };
-
-  // Funções de categoria
   const adicionarCategoria = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!novaCategoria.nome || !novaCategoria.descricao) {
@@ -210,8 +198,9 @@ const Admin: React.FC = () => {
     }
   };
 
-  // Se não logado
-  if (!logado) return <Login onLogin={handleLogin} />;
+  if (!logado) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   return (
     <div className="admin-layout">
@@ -226,7 +215,6 @@ const Admin: React.FC = () => {
             <p>Painel Administrativo</p>
           </div>
         </div>
-
         <div className="header-user">
           <img src="./src/Icons/usuario.png" alt="Avatar" className="user-avatar" />
           <span className="user-name">Simone</span>
@@ -254,32 +242,34 @@ const Admin: React.FC = () => {
         <button onClick={handleLogout} className="logout-button">Sair</button>
       </header>
 
-      {/* PÁGINAS */}
+      {/* Renderização condicional */}
       {pagina === "inicio" && (
         <AdminHome
           pratos={pratos.length}
-          categorias={categorias.length}
+          categorias={categoriasFirestore.length}
           fotos={photos.length}
           eventos={eventos}
           atividades={atividades}
-          onNavigateTo={handleNavigateTo}
+          onNavigateTo={(p) => setPagina(p)}
         />
       )}
-
       {pagina === "cardapio" && (
         <AdminMenu
           pratos={pratos}
-          categorias={categorias}
+          categorias={categoriasFirestore}
           onAddPrato={handleAddPrato}
           onDeletePrato={handleDeletePrato}
           onEditPrato={handleEditPrato}
         />
       )}
-
       {pagina === "fotos" && (
-        <AdminPhotos photos={photos} setPhotos={setPhotos} />
+        <AdminPhotos
+          photos={photos}
+          setPhotos={setPhotos}
+          categories={categories}
+          setCategories={setCategories}
+        />
       )}
-
       {pagina === "categorias" && (
         <div className="categories-container">
           <h2>Categorias</h2>
@@ -303,9 +293,8 @@ const Admin: React.FC = () => {
               {editandoCategoriaId ? "Salvar Alteração" : "Salvar Categoria"}
             </button>
           </form>
-
           <ul>
-            {categorias.map((c) => (
+            {categoriasFirestore.map((c) => (
               <li key={c.id}>
                 📌 {c.nome} - {c.descricao}
                 <button
@@ -313,32 +302,10 @@ const Admin: React.FC = () => {
                     setNovaCategoria({ nome: c.nome, descricao: c.descricao });
                     setEditandoCategoriaId(c.id);
                   }}
-                  style={{
-                    marginLeft: "10px",
-                    padding: "2px 6px",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    background: "#e6007e",
-                    color: "white",
-                    border: "none",
-                  }}
                 >
                   Editar
                 </button>
-                <button
-                  onClick={() => excluirCategoria(c.id)}
-                  style={{
-                    marginLeft: "5px",
-                    padding: "2px 6px",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    background: "#ff3333",
-                    color: "white",
-                    border: "none",
-                  }}
-                >
-                  Excluir
-                </button>
+                <button onClick={() => excluirCategoria(c.id)}>Excluir</button>
               </li>
             ))}
           </ul>
