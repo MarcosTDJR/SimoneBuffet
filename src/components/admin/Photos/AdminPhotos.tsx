@@ -56,7 +56,7 @@ const AdminPhotos: React.FC<AdminPhotosProps> = ({
         <div className="stat-card">
           <h3>Espaço Usado</h3>
           <p className="stat-number">{Math.round(fotos * 2.5)}MB</p>
-          <small>Aproximadamente 2.5MB por foto</small>
+          <small>Aproximadamente 2.0MB por foto</small>
         </div>
       </section>
 
