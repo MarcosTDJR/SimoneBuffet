@@ -69,21 +69,25 @@ export function HeroSection() {
             </div>
 
             {/* Call to actions */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                onClick={scrollToCardapio}
-                size="lg"
-                className="bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white px-8 py-4"
-              >
-                Ver Cardápio
-              </Button>
-              <Button
-                onClick={scrollToContato}
-                size="lg"
-                className="bg-white text-rose-600 border border-rose-300 hover:bg-rose-100 px-8 py-4"              >
-                Solicitar Orçamento
-              </Button>
-            </div>
+            {/* Call to actions */}
+<div className="flex flex-col sm:flex-row gap-4">
+  <Button
+    onClick={scrollToCardapio}
+    size="lg"
+    className="bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white px-8 py-4 cursor-pointer transition-transform transform hover:scale-105"
+  >
+    Ver Cardápio
+  </Button>
+
+  <Button
+    onClick={scrollToContato}
+    size="lg"
+    className="bg-white text-rose-600 border border-rose-300 hover:bg-rose-100 px-8 py-4 cursor-pointer transition-transform transform hover:scale-105"
+  >
+    Solicitar Orçamento
+  </Button>
+</div>
+
           </div>
 
           {/* Imagem hero */}

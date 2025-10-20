@@ -2,15 +2,14 @@ import { Menu, Phone, MapPin, Clock, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import { MenuItem } from "../Home"; // importa o tipo do Home
 
-interface ItemCardapio {
-  id: number;
-  nome: string;
-  preco: number;
+interface HeaderProps {
+  carrinho: MenuItem[];
+  removerDoCarrinho: (id: string) => void;
 }
 
-export function Header() {
-  const [carrinho, setCarrinho] = useState<ItemCardapio[]>([]);
+export function Header({ carrinho, removerDoCarrinho }: HeaderProps) {
   const [showCarrinho, setShowCarrinho] = useState(false);
 
   const scrollToSection = (id: string) => {
@@ -20,22 +19,10 @@ export function Header() {
     }
   };
 
-  // Exemplo de cardápio
-  const cardapio: ItemCardapio[] = [
-    { id: 1, nome: "Coxinha", preco: 5 },
-    { id: 2, nome: "Brigadeiro", preco: 3 },
-    { id: 3, nome: "Mini Sanduíche", preco: 7 },
-  ];
-
-  const adicionarAoCarrinho = (item: ItemCardapio) => {
-    setCarrinho([...carrinho, item]);
-  };
-
-  const removerDoCarrinho = (id: number) => {
-    setCarrinho(carrinho.filter(item => item.id !== id));
-  };
-
-  const total = carrinho.reduce((acc, item) => acc + item.preco, 0);
+  const total = carrinho.reduce(
+    (acc, item) => acc + parseFloat(item.price.replace("R$ ", "")),
+    0
+  );
 
   return (
     <header className="bg-white/95 backdrop-blur-sm border-b border-rose-100 sticky top-0 z-50">
@@ -80,39 +67,51 @@ export function Header() {
           <button onClick={() => scrollToSection('contato')} className="text-gray-700 hover:text-rose-600 transition-colors">Contato</button>
 
           {/* Botão do carrinho */}
-          <div className="relative">
-            <Button
-              onClick={() => setShowCarrinho(!showCarrinho)}
-              className="bg-gradient-to-r from-rose-400 to-rose-600 hover:from-rose-500 hover:to-rose-700 flex items-center gap-2"
-            >
-              <ShoppingCart className="w-5 h-5" /> Carrinho ({carrinho.length})
-            </Button>
+          {/* Botão do carrinho */}
+<div className="relative">
+  <Button
+    onClick={() => setShowCarrinho(!showCarrinho)}
+    className="bg-gradient-to-r from-rose-400 to-rose-600 hover:from-rose-500 hover:to-rose-700 flex items-center gap-2 transition-all transform hover:scale-105"
+  >
+    <ShoppingCart className="w-5 h-5" />
+    <span className="cursor-pointer">Carrinho ({carrinho.length})</span>
+  </Button>
+        
+  {/* Dropdown do carrinho */}
+  {showCarrinho && (
+    <div className="absolute right-0 mt-2 w-64 bg-white border rounded-lg shadow-lg z-50 p-4 animate-fade-in">
+      {carrinho.length === 0 ? (
+        <p className="text-gray-600 text-sm">Seu carrinho está vazio.</p>
+      ) : (
+        <>
+          <ul className="space-y-2">
+            {carrinho.map((item, idx) => (
+              <li key={idx} className="flex justify-between items-center">
+                <span>{item.nome}</span>
+                <div className="flex items-center gap-2">
+                  <span>R$ {item.preco}</span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-red-500"
+                    onClick={() => removerDoCarrinho(item.id)}
+                  >
+                    X
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 font-semibold">Total: R$ {total}</p>
+          <Button className="w-full mt-2 bg-rose-500 hover:bg-rose-600 text-white">
+            Finalizar Pedido
+          </Button>
+        </>
+      )}
+    </div>
+  )}
+</div>
 
-            {/* Dropdown do carrinho */}
-            {showCarrinho && (
-              <div className="absolute right-0 mt-2 w-64 bg-white border rounded-lg shadow-lg z-50 p-4">
-                {carrinho.length === 0 ? (
-                  <p className="text-gray-600 text-sm">Seu carrinho está vazio.</p>
-                ) : (
-                  <>
-                    <ul className="space-y-2">
-                      {carrinho.map((item, idx) => (
-                        <li key={idx} className="flex justify-between items-center">
-                          <span>{item.nome}</span>
-                          <div className="flex items-center gap-2">
-                            <span>R$ {item.preco}</span>
-                            <Button size="sm" variant="outline" className="text-red-500" onClick={() => removerDoCarrinho(item.id)}>X</Button>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="mt-2 font-semibold">Total: R$ {total}</p>
-                    <Button className="w-full mt-2 bg-rose-500 hover:bg-rose-600 text-white">Finalizar Pedido</Button>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
         </nav>
 
         {/* Menu mobile */}

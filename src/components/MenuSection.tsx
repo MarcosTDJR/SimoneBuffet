@@ -1,4 +1,3 @@
-// src/components/MenuSection.tsx
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
@@ -7,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { db } from "../firebaseConfig";
 import { collection, onSnapshot } from "firebase/firestore";
 
-type MenuItem = {
+export type MenuItem = {
   id: string;
   name: string;
   description: string;
@@ -23,18 +22,20 @@ type MenuCategory = {
   items: MenuItem[];
 };
 
-export function MenuSection() {
-  const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
-  useEffect(() => {
-    let unsubscribePratos: () => void;
-    let unsubscribeCategorias: () => void;
+interface MenuSectionProps {
+  adicionarAoCarrinho: (item: MenuItem) => void;
+}
 
+export function MenuSection({ adicionarAoCarrinho }: MenuSectionProps) {
+  const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+
+  useEffect(() => {
     const pratosCollection = collection(db, "pratos");
     const categoriasCollection = collection(db, "categorias");
 
-    // 🔥 Escuta em tempo real os pratos
-    unsubscribePratos = onSnapshot(pratosCollection, (snapshotPratos) => {
-      const pratos = snapshotPratos.docs.map(doc => {
+    const unsubscribe = onSnapshot(pratosCollection, (snapshotPratos) => {
+      const pratos = snapshotPratos.docs.map((doc) => {
         const data = doc.data() as { nome: string; preco: number; categoriaId?: string };
         return {
           id: doc.id,
@@ -45,79 +46,50 @@ export function MenuSection() {
         };
       });
 
-      // Agora pega categorias
-      unsubscribeCategorias = onSnapshot(categoriasCollection, (snapshotCats) => {
-        const categorias = snapshotCats.docs.map(doc => {
+      onSnapshot(categoriasCollection, (snapshotCats) => {
+        const categorias = snapshotCats.docs.map((doc) => {
           const data = doc.data() as { nome: string; descricao: string };
           return {
             id: doc.id,
             name: data.nome,
             description: data.descricao,
-            image: "https://images.unsplash.com/photo-1585216045166-56dd417c7f8f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080", // Pode customizar
+            image:
+              "https://images.unsplash.com/photo-1585216045166-56dd417c7f8f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
           };
         });
 
-        // Cria menuCategories combinando categorias e pratos
-        const menu = categorias.map(cat => ({
+        const menu = categorias.map((cat) => ({
           ...cat,
-          items: pratos.filter(p => p.categoriaId === cat.id)
+          items: pratos.filter((p) => p.categoriaId === cat.id),
         }));
 
-        // Se houver pratos sem categoria, criar uma categoria "Outros"
-        const semCategoria = pratos.filter(p => p.categoriaId === "sem-categoria");
+        const semCategoria = pratos.filter((p) => p.categoriaId === "sem-categoria");
         if (semCategoria.length > 0) {
           menu.push({
             id: "outros",
             name: "Outros Pratos",
             description: "Pratos ainda sem categoria",
-            image: "https://images.unsplash.com/photo-1585216045166-56dd417c7f8f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-            items: semCategoria
+            image:
+              "https://images.unsplash.com/photo-1585216045166-56dd417c7f8f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
+            items: semCategoria,
           });
         }
 
         setMenuCategories(menu);
-      });
-    });
 
-    return () => {
-      unsubscribePratos?.();
-      unsubscribeCategorias?.();
-    };
-  }, []);
-
-  useEffect(() => {
-    // Escuta em tempo real os pratos adicionados no Firestore
-    const unsub = onSnapshot(collection(db, "pratos"), (snapshot) => {
-      const pratos: MenuItem[] = snapshot.docs.map((doc) => {
-        const data = doc.data() as { nome: string; preco: number };
-        return {
-          id: doc.id,
-          name: data.nome,
-          description: "Prato adicionado pelo administrador 🍴", // pode expandir depois
-          price: `R$ ${data.preco.toFixed(2)}`
-        };
-      });
-
-      // Aqui você decide em qual categoria os pratos vão entrar
-      // Exemplo: todos no "Pratos Principais"
-      setMenuCategories([
-        {
-          id: "pratos",
-          name: "Pratos Principais",
-          description: "Refeições completas e saborosas",
-          image: "https://images.unsplash.com/photo-1585216045166-56dd417c7f8f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-          items: pratos
+        // Seleciona a primeira categoria automaticamente
+        if (!selectedCategory && menu.length > 0) {
+          setSelectedCategory(menu[0].id);
         }
-      ]);
+      });
     });
 
-    return () => unsub();
+    return () => unsubscribe();
   }, []);
 
   return (
     <section id="cardapio" className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        {/* Header da seção */}
         <div className="text-center mb-16">
           <h2 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-4">
             Sabores que{" "}
@@ -130,14 +102,17 @@ export function MenuSection() {
           </p>
         </div>
 
-        {/* Tabs do cardápio */}
-        <Tabs defaultValue={menuCategories[0]?.id} className="max-w-7xl mx-auto">
-          <TabsList className="grid w-full grid-cols-1 lg:grid-cols-4 mb-12 bg-rose-50 p-2 rounded-xl">
+        <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="max-w-7xl mx-auto">
+          <TabsList className="flex justify-center flex-wrap gap-4 w-full mb-12 bg-transparent p-0">
             {menuCategories.map((category) => (
               <TabsTrigger
                 key={category.id}
                 value={category.id}
-                className="data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-sm rounded-lg py-3"
+                className="cursor-pointer px-6 py-3 font-medium rounded-md border border-rose-200 text-gray-700
+                   bg-white shadow-sm transition-all duration-300
+                   hover:bg-rose-100 hover:text-rose-600 hover:shadow-md
+                   data-[state=active]:bg-rose-600 data-[state=active]:text-white data-[state=active]:border-rose-600
+                   data-[state=active]:shadow-lg"
               >
                 {category.name}
               </TabsTrigger>
@@ -146,7 +121,6 @@ export function MenuSection() {
 
           {menuCategories.map((category) => (
             <TabsContent key={category.id} value={category.id} className="space-y-8">
-              {/* Header da categoria */}
               <div className="text-center mb-12">
                 <div className="relative w-full h-64 rounded-2xl overflow-hidden mb-6 shadow-lg">
                   <ImageWithFallback
@@ -163,7 +137,6 @@ export function MenuSection() {
                 </div>
               </div>
 
-              {/* Grid de itens */}
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {category.items.map((item) => (
                   <Card
@@ -181,14 +154,13 @@ export function MenuSection() {
                           </Badge>
                         )}
                       </div>
-                      <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                        {item.description}
-                      </p>
+                      <p className="text-gray-600 text-sm mb-4 leading-relaxed">{item.description}</p>
                       <div className="flex justify-between items-center">
-                        <span className="text-rose-600 font-bold text-lg">
-                          {item.price}
-                        </span>
-                        <button className="bg-rose-50 text-rose-600 px-4 py-2 rounded-lg hover:bg-rose-100 transition-colors text-sm font-medium">
+                        <span className="text-rose-600 font-bold text-lg">{item.price}</span>
+                        <button
+                          onClick={() => adicionarAoCarrinho(item)}
+                          className="bg-rose-50 text-rose-600 px-4 py-2 rounded-lg hover:bg-rose-100 transition-colors text-sm font-medium"
+                        >
                           Adicionar
                         </button>
                       </div>
