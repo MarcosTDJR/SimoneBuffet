@@ -21,9 +21,9 @@ export function Footer() {
               Cada evento é único, cada sabor é inesquecível.
             </p>
             <div className="flex gap-3">
-              <div className="w-8 h-8 bg-rose-600 rounded-lg flex items-center justify-center hover:bg-rose-700 transition-colors cursor-pointer">
+              <a href="https://www.instagram.com/buffet_simone/" target="_blank" className="w-8 h-8 bg-rose-600 rounded-lg flex items-center justify-center hover:bg-rose-700 transition-colors cursor-pointer">
                 <Instagram size={16} />
-              </div>
+              </a>
               <div className="w-8 h-8 bg-rose-600 rounded-lg flex items-center justify-center hover:bg-rose-700 transition-colors cursor-pointer">
                 <Facebook size={16} />
               </div>

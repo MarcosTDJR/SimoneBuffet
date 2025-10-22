@@ -32,7 +32,7 @@ export function Header({ carrinho, removerDoCarrinho }: HeaderProps) {
           <div className="flex flex-wrap items-center justify-center md:justify-between gap-4 text-sm">
             <div className="flex items-center gap-2">
               <Phone size={16} />
-              <span>(11) 9999-9999</span>
+              <span>(11) 96054-8369</span>
             </div>
             <div className="flex items-center gap-2">
               <MapPin size={16} />
@@ -71,7 +71,7 @@ export function Header({ carrinho, removerDoCarrinho }: HeaderProps) {
 <div className="relative">
   <Button
     onClick={() => setShowCarrinho(!showCarrinho)}
-    className="bg-gradient-to-r from-rose-400 to-rose-600 hover:from-rose-500 hover:to-rose-700 flex items-center gap-2 transition-all transform hover:scale-105"
+    className="bg-gradient-to-r from-rose-400 to-rose-600 cursor-pointer hover:from-rose-500 hover:to-rose-700 flex items-center gap-2 transition-all transform hover:scale-105"
   >
     <ShoppingCart className="w-5 h-5" />
     <span className="cursor-pointer">Carrinho ({carrinho.length})</span>

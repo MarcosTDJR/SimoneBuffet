@@ -95,7 +95,7 @@ Olá, quero solicitar um orçamento:
     {
       icon: Phone,
       title: "Telefone",
-      details: ["(11) 9999-9999", "(11) 3333-3333"],
+      details: ["(11) 96054-8369"],
       action: "Ligar Agora",
     },
     {
@@ -113,7 +113,7 @@ Olá, quero solicitar um orçamento:
     {
       icon: Mail,
       title: "E-mail",
-      details: ["contato@buffetsimone.com", "eventos@buffetsimone.com"],
+      details: ["simonebuffetgerenciador@gmail.com"],
       action: "Enviar E-mail",
     },
   ];

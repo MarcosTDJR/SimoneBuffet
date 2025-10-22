@@ -94,7 +94,7 @@ export function HeroSection() {
           <div className="relative">
             <div className="relative w-full h-[600px] rounded-2xl overflow-hidden shadow-2xl">
               <ImageWithFallback
-                src="https://images.unsplash.com/photo-1751651054985-7dc01c37369c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlbGVnYW50JTIwYnVmZmV0JTIwZm9vZCUyMHNwcmVhZHxlbnwxfHx8fDE3NTU5NTYxODV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+                src="src/images/esculturaFrutas.jpeg"
                 alt="Buffet Simone - Mesa elegante com variedade de pratos"
                 className="w-full h-full object-cover"
               />

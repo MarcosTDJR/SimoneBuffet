@@ -1,13 +1,13 @@
 import { Card, CardContent } from "./ui/card";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { Heart, Users, Award, Sparkles } from "lucide-react";
+import { Heart, Users, Award, Sparkles, Recycle } from "lucide-react";
 
 export function AboutSection() {
   const features = [
     {
       icon: Heart,
-      title: "Feito com Amor",
-      description: "Cada prato é preparado com carinho e ingredientes selecionados especialmente para você."
+      title: "Feito com Amor e Qualidade",
+      description: "Cada prato é preparado com carinho e ingredientes premium selecionados especialmente para você."
     },
     {
       icon: Users,
@@ -15,9 +15,9 @@ export function AboutSection() {
       description: "Mais de 15 anos atendendo famílias e criando momentos especiais inesquecíveis."
     },
     {
-      icon: Award,
-      title: "Qualidade Premium",
-      description: "Ingredientes frescos e de primeira qualidade em todas as nossas criações culinárias."
+      icon: Recycle,
+      title: "Sustentável",
+      description: "Fazemos o descarte sustentável, como por exemplo da borra de café que envolve a transformação de resíduos em produtos ecológicos, como adubos, cosméticos e utensílios."
     },
     {
       icon: Sparkles,
@@ -34,7 +34,7 @@ export function AboutSection() {
           <div className="relative">
             <div className="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-2xl">
               <ImageWithFallback
-                src="https://images.unsplash.com/photo-1697659602792-31dcb2a5a4ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaGVmJTIwY29va2luZyUyMGtpdGNoZW58ZW58MXx8fHwxNzU1OTA5Njg1fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+                src="src/images/simoneFotoCut.jpeg"
                 alt="Chef Simone preparando pratos especiais"
                 className="w-full h-full object-cover"
               />
