@@ -34,7 +34,7 @@ export function AboutSection() {
           <div className="relative">
             <div className="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-2xl">
               <ImageWithFallback
-                src="src/images/simoneFotoCut.jpeg"
+                src="public/images/simoneFotoCut.jpeg"
                 alt="Chef Simone preparando pratos especiais"
                 className="w-full h-full object-cover"
               />
