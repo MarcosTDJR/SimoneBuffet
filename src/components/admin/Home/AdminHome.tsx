@@ -1,11 +1,11 @@
 import React from "react";
 import "./HomeModules.css";
-const garfoFacaIcon = "/src/Icons/garfo-faca.png";
-const categoriaIcon = "/src/Icons/categoria.png";
-const galeriaIcon = "/src/Icons/galeria.png";
-const mensagemIcon = "/src/Icons/mensagem.png";
-const garfoFacaBlackIcon = "/src/Icons/garfo-faca-black.png";
-const galeriaBlackIcon = "/src/Icons/galeria-black.png";
+const garfoFacaIcon = "/Icons/garfo-faca.png";
+const categoriaIcon = "/Icons/categoria.png";
+const galeriaIcon = "/Icons/galeria.png";
+const mensagemIcon = "/Icons/mensagem.png";
+const garfoFacaBlackIcon = "/Icons/garfo-faca-black.png";
+const galeriaBlackIcon = "/Icons/galeria-black.png";
 
 
 interface AdminHomeProps {

@@ -15,10 +15,10 @@ import Login from "./components/admin/Login/Login";
 import AdminMenu from "./components/admin/Menu/AdminMenu";
 import { AdminPhotos, Photo, Category } from "./components/admin/Photos/AdminPhotos";
 
-const homeIcon = "/src/Icons/home-black.png";
-const cardapioIcon = "/src/Icons/cardapio-black.png";
-const categoriaIcon = "/src/Icons/categoria-black.png";
-const galeriaIcon = "/src/Icons/galeria-black.png";
+const homeIcon = "/Icons/home-black.png";
+const cardapioIcon = "/Icons/cardapio-black.png";
+const categoriaIcon = "/Icons/categoria-black.png";
+const galeriaIcon = "/Icons/galeria-black.png";
 
 interface Prato {
   id: string;
@@ -208,7 +208,7 @@ const Admin: React.FC = () => {
       <header className="header-top">
         <div className="header-brand">
           <div className="icon-container">
-            <img src="./src/Icons/garfo-faca.png" alt="Buffet Simone" />
+            <img src="/Icons/garfo-faca.png" alt="Buffet Simone" />
           </div>
           <div className="header-brand-text">
             <h1>Buffet Simone</h1>
@@ -216,7 +216,7 @@ const Admin: React.FC = () => {
           </div>
         </div>
         <div className="header-user">
-          <img src="./src/Icons/usuario.png" alt="Avatar" className="user-avatar" />
+          <img src="/Icons/usuario.png" alt="Avatar" className="user-avatar" />
           <span className="user-name">Simone</span>
         </div>
       </header>
