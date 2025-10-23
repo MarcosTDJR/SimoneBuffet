@@ -94,7 +94,7 @@ export function HeroSection() {
           <div className="relative">
             <div className="relative w-full h-[600px] rounded-2xl overflow-hidden shadow-2xl">
               <ImageWithFallback
-                src="public/images/esculturaFrutas.jpeg"
+                src="build/images/esculturaFrutas.jpeg"
                 alt="Buffet Simone - Mesa elegante com variedade de pratos"
                 className="w-full h-full object-cover"
               />
