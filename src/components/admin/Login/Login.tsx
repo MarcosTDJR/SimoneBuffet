@@ -2,23 +2,23 @@
 import React, { useState } from "react";
 import "./Login.css";
 
-import boloWhite from "../../../Icons/bolo-white.png";
-import boloColor from "../../../Icons/bolo-color.gif";
-import fundo from "../../../Icons/rectangle 19.png";
-import frutas from "../../../Icons/Group 10.png";
-import frutasbaixo from "../../../Icons/Group (baixo).png";
-import loginOriginal from "../../../Icons/b.png";
-import animacaoSalada from "../../../Icons/healthy-food (1).gif";
-import fruitSaladPana from "../../../Icons/fruit salad-pana.gif";
-import healthyFoodBro from "../../../Icons/healthy food-bro.png";
-import userIcon from "../../../Icons/user.png";
-import senhaIcon from "../../../Icons/senha.png";
-import olhoAberto from "../../../Icons/olhoAberto.png";
-import olhoFechado from "../../../Icons/olhoFechado.png";
-import emailIcon from "../../../Icons/email.png";
-import codigoIcon from "../../../Icons/codigoIcon.png";
-import iconeErroCodigo from "../../../Icons/iconeErroCodigo.png";
-import fundoCinzaDireita from "../../../Icons/fundoCinzaDireita.png";
+import boloWhite from "/Icons/bolo-white.png";
+import boloColor from "/Icons/bolo-color.gif";
+import fundo from "/Icons/rectangle 19.png";
+import frutas from "/Icons/Group 10.png";
+import frutasbaixo from "/Icons/Group (baixo).png";
+import loginOriginal from "/Icons/b.png";
+import animacaoSalada from "/Icons/healthy-food (1).gif";
+import fruitSaladPana from "/Icons/fruit salad-pana.gif";
+import healthyFoodBro from "/Icons/healthy food-bro.png";
+import userIcon from "/Icons/user.png";
+import senhaIcon from "/Icons/senha.png";
+import olhoAberto from "/Icons/olhoAberto.png";
+import olhoFechado from "/Icons/olhoFechado.png";
+import emailIcon from "/Icons/email.png";
+import codigoIcon from "/Icons/codigoIcon.png";
+import iconeErroCodigo from "/Icons/iconeErroCodigo.png";
+import fundoCinzaDireita from "/Icons/fundoCinzaDireita.png";
 
 interface LoginProps {
   onLogin: (usuario: string, senha: string) => void;

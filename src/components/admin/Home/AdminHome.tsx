@@ -7,7 +7,7 @@ const mensagemIcon = "/Icons/mensagem.png";
 const garfoFacaBlackIcon = "/Icons/garfo-faca-black.png";
 const galeriaBlackIcon = "/Icons/galeria-black.png";
 
-import fundo from "../../../Icons/rectangle 19.png";
+import fundo from "/Icons/rectangle 19.png";
 
 
 interface AdminHomeProps {
