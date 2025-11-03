@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import './PhotoModules.css'
+import "./PhotoModules.css";
 import {
   UtensilsCrossed,
   Cake,
@@ -43,11 +43,18 @@ interface CategoryChipProps {
   onClick?: () => void;
 }
 
-function CategoryChip({ icon: Icon, label, active, onClick }: CategoryChipProps) {
+function CategoryChip({
+  icon: Icon,
+  label,
+  active,
+  onClick,
+}: CategoryChipProps) {
   return (
     <button
       onClick={onClick}
-      className={`photo-category-chip ${active ? "photo-category-chip--active" : ""}`}
+      className={`photo-category-chip ${
+        active ? "photo-category-chip--active" : ""
+      }`}
       type="button"
     >
       <Icon className="w-5 h-5" />
@@ -82,7 +89,9 @@ export function AdminPhotos({
   });
 
   const [newCategoryLabel, setNewCategoryLabel] = useState("");
-  const [selectedIconLabel, setSelectedIconLabel] = useState<string | null>(null);
+  const [selectedIconLabel, setSelectedIconLabel] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     const savedPhotos = localStorage.getItem("photos");
@@ -158,56 +167,59 @@ export function AdminPhotos({
       <h1 className="photo-admin-title">Gerenciar Fotos</h1>
 
       <section className="photo-category-section">
-
         <div className="photo-category-select">
-        <h2 className="photo-category-title"> Adicionar nova categoria</h2>
-        <div className="photo-icon-picker" style={{ marginTop: 16 }}>
-          
-          {ICON_OPTIONS.map(({ label, icon: Icon }) => (
-            <button
-              key={label}
-              onClick={() => setSelectedIconLabel(label)}
-              className={`photo-icon-button ${selectedIconLabel === label ? "photo-icon-button--selected" : ""}`}
-              type="button"
-              title={label}
-            >
-              <Icon className="w-6 h-6 text-rose-600" />
-            </button>
-          ))}
-        </div>
-        
+          <h2 className="photo-category-title"> Adicionar nova categoria</h2>
+          <div className="photo-icon-picker" style={{ marginTop: 16 }}>
+            {ICON_OPTIONS.map(({ label, icon: Icon }) => (
+              <button
+                key={label}
+                onClick={() => setSelectedIconLabel(label)}
+                className={`photo-icon-button ${
+                  selectedIconLabel === label
+                    ? "photo-icon-button--selected"
+                    : ""
+                }`}
+                type="button"
+                title={label}
+              >
+                <Icon className="w-6 h-6 text-rose-600" />
+              </button>
+            ))}
+          </div>
 
-        <div className="photo-category-form">
-          <input
-            type="text"
-            placeholder="Nome da nova categoria"
-            value={newCategoryLabel}
-            onChange={(e) => setNewCategoryLabel(e.target.value)}
-            className="photo-category-input"
-          />
-          <button
-            onClick={handleAddCategory}
-            className="photo-category-add-btn"
-            type="button"
-          >
-            Adicionar Categoria
-          </button>
+          <div className="photo-category-form">
+            <input
+              type="text"
+              placeholder="Nome da nova categoria"
+              value={newCategoryLabel}
+              onChange={(e) => setNewCategoryLabel(e.target.value)}
+              className="photo-category-input"
+            />
+            <button
+              onClick={handleAddCategory}
+              className="photo-category-add-btn"
+              type="button"
+            >
+              Adicionar Categoria
+            </button>
           </div>
         </div>
 
         <div className="photo-category-creator">
-        <h2 className="photo-category-title">Categorias</h2>
-        <div className="photo-select-icon">
-          {categories.map((cat) => (
-            <CategoryChip
-              key={cat.label}
-              icon={getIconByLabel(cat.iconLabel)}
-              label={cat.label}
-              active={newPhoto.category === cat.label}
-              onClick={() => setNewPhoto({ ...newPhoto, category: cat.label })}
-            />
-          ))}
-        </div>
+          <h2 className="photo-category-title">Categorias</h2>
+          <div className="photo-select-icon">
+            {categories.map((cat) => (
+              <CategoryChip
+                key={cat.label}
+                icon={getIconByLabel(cat.iconLabel)}
+                label={cat.label}
+                active={newPhoto.category === cat.label}
+                onClick={() =>
+                  setNewPhoto({ ...newPhoto, category: cat.label })
+                }
+              />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -223,19 +235,37 @@ export function AdminPhotos({
         <textarea
           placeholder="Descrição"
           value={newPhoto.description}
-          onChange={(e) => setNewPhoto({ ...newPhoto, description: e.target.value })}
+          onChange={(e) =>
+            setNewPhoto({ ...newPhoto, description: e.target.value })
+          }
           className="photo-upload-textarea"
         />
         <p className="photo-upload-label">
           Categoria selecionada:{" "}
-          <strong className="photo-upload-selected">{newPhoto.category || "Nenhuma selecionada"}</strong>
+          <strong className="photo-upload-selected">
+            {newPhoto.category || "Nenhuma selecionada"}
+          </strong>
         </p>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="mb-3"
-        />
+        <div className="photo-upload-input-wrapper">
+          <label htmlFor="photo-upload" className="photo-upload-label-btn">
+            Escolher imagem
+          </label>
+          <input
+            id="photo-upload"
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="photo-upload-hidden"
+          />
+          {newPhoto.file ? (
+            <span className="photo-upload-filename">{newPhoto.file.name}</span>
+          ) : (
+            <span className="photo-upload-placeholder">
+              Nenhum arquivo escolhido
+            </span>
+          )}
+        </div>
+
         <button
           onClick={handleAddPhoto}
           className="photo-upload-btn"
