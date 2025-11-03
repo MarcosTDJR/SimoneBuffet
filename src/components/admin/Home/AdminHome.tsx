@@ -7,6 +7,8 @@ const mensagemIcon = "/Icons/mensagem.png";
 const garfoFacaBlackIcon = "/Icons/garfo-faca-black.png";
 const galeriaBlackIcon = "/Icons/galeria-black.png";
 
+import fundo from "../../../Icons/rectangle 19.png";
+
 
 interface AdminHomeProps {
   pratos: number;
@@ -26,12 +28,12 @@ const AdminHome: React.FC<AdminHomeProps> = ({
   onNavigateTo,
 }) => {
 return (
-  <div className="navbar">
+  <div className="navbar" style={{ backgroundImage: `url(${fundo})` }}>
     <div className="dashboard-content">
       
       <div className="welcome-card">
         <h2>Bem-vinda, Simone!</h2>
-        <p>Aqui você pode gerenciar seu cardápio e fotos de forma simples e rápida.</p>
+        <h1>Aqui você pode gerenciar seu cardápio e fotos de forma simples e rápida.</h1>
       </div>
     <section className="stats-container">
       <div className="stats-card">
