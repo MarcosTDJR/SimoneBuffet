@@ -53,7 +53,7 @@
   height: 65vh;
   max-height: 80vh; /* MUDANÇA: adiciona altura máxima */
   background: rgba(255, 255, 255, 0.114);
-  backdrop-filter: blur(6px);
+  
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 0 40px 40px 0;
   box-shadow: 0 4px 20px 0 rgba(255,2,2,0.25);
@@ -91,9 +91,9 @@
 
 .animacao-salada {
   position: absolute;
-  top: -1vh;
-  right: 20vw;
-  width: 300px;
+  top: -3vh;
+  right: 2vw;
+  width: 250px;
   height: auto;
   z-index: 3;
   transform: rotate(180deg);
@@ -102,7 +102,7 @@
 .fruit-salad-pana {
   position: absolute;
   bottom: 0;
-  right: -3.5vw;
+  right: -5.5vw;
   width: 350px;
   height: auto;
   z-index: 3;
@@ -112,7 +112,7 @@
 .healthy-food-bro {
   position: absolute;
   bottom: 10px;
-  right: 36.5vw;
+  right: 40.5vw;
   width: 300px;
   height: auto;
   z-index: 3;
