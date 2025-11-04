@@ -57,6 +57,7 @@ export function ContactSection() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Executa todas as validações
     const newErrors: { [key: string]: string } = {
       nome: validateNome(nome),
       telefone: validateTelefone(telefone),
@@ -65,29 +66,38 @@ export function ContactSection() {
       alergias: validateAlergias(alergias),
     };
 
+    // Atualiza os erros
     setErrors(newErrors);
 
-    // verifica se tem erro
+    // Verifica se há algum erro
     const hasError = Object.values(newErrors).some((msg) => msg !== "");
-    if (hasError) return; // não envia se tiver erro
+    if (hasError) {
+      console.log("❌ Formulário inválido:", newErrors);
+      return;
+    }
 
+    // Monta a mensagem do WhatsApp
     const mensagem = `
-Olá, quero solicitar um orçamento:
-- Nome: ${nome}
-- Telefone: ${telefone}
-- E-mail: ${email}
-- Tipo de Evento: ${tipoEvento}
-- Data do Evento: ${dataEvento}
-- Número de Convidados: ${numConvidados}
-- Detalhes: ${detalhes}
-- Possui alergia: ${temAlergia}${temAlergia === "sim" ? ` (${alergias})` : ""}
-    `;
+Olá! Gostaria de solicitar um orçamento:
+👤 Nome: ${nome}
+📞 Telefone: ${telefone}
+📧 E-mail: ${email}
+🎉 Tipo de Evento: ${tipoEvento || "Não informado"}
+📅 Data: ${dataEvento || "Não informada"}
+👥 Convidados: ${numConvidados || "Não informado"}
+📝 Detalhes: ${detalhes || "Nenhum detalhe adicional"}
+⚠️ Possui alergia: ${temAlergia}${
+      temAlergia === "sim" ? ` (${alergias || "não especificadas"})` : ""
+    }
+  `;
 
-    const numeroWhats = "5511960882764";
+    // Abre o WhatsApp
+    const numeroWhats = "5511951631729";
     const url = `https://api.whatsapp.com/send?phone=${numeroWhats}&text=${encodeURIComponent(
       mensagem
     )}`;
 
+    console.log("✅ Enviando para:", url);
     window.open(url, "_blank");
   };
 
@@ -385,4 +395,3 @@ Olá, quero solicitar um orçamento:
     </section>
   );
 }
-

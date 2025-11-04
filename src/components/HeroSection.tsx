@@ -4,21 +4,24 @@ import { ImageWithFallback } from "./figma/ImageWithFallback";
 
 export function HeroSection() {
   const scrollToCardapio = () => {
-    const element = document.getElementById('cardapio');
+    const element = document.getElementById("cardapio");
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
   const scrollToContato = () => {
-    const element = document.getElementById('contato');
+    const element = document.getElementById("contato");
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
   return (
-    <section id="inicio" className="min-h-screen bg-gradient-to-br from-rose-50 via-beige-50 to-rose-100 relative overflow-hidden">
+    <section
+      id="inicio"
+      className="min-h-screen bg-gradient-to-br from-rose-50 via-beige-50 to-rose-100 relative overflow-hidden"
+    >
       {/* Decorative elements */}
       <div className="absolute bottom-20 right-10 w-16 h-16 bg-beige-300 rounded-full opacity-50 animate-pulse"></div>
       <div className="container mx-auto px-4 py-20">
@@ -32,12 +35,16 @@ export function HeroSection() {
               </div>
 
               <h1 className="text-5xl lg:text-6xl font-bold text-gray-800 leading-tight">
-                Buffet <span className="text-transparent bg-gradient-to-r from-rose-500 to-rose-700 bg-clip-text">Simone</span>
+                Buffet{" "}
+                <span className="text-transparent bg-gradient-to-r from-rose-500 to-rose-700 bg-clip-text">
+                  Simone
+                </span>
               </h1>
 
               <p className="text-xl text-gray-600 leading-relaxed">
-                Transformamos seus momentos especiais em experiências gastronômicas únicas.
-                Sabores autênticos, ingredientes frescos e o carinho de sempre.
+                Transformamos seus momentos especiais em experiências
+                gastronômicas únicas. Sabores autênticos, ingredientes frescos e
+                o carinho de sempre.
               </p>
             </div>
 
@@ -64,30 +71,30 @@ export function HeroSection() {
                   <Heart className="w-6 h-6 text-rose-600" />
                 </div>
                 <div className="text-2xl font-bold text-gray-800">98%</div>
-                <div className="text-sm text-gray-600">Clientes satisfeitos</div>
+                <div className="text-sm text-gray-600">
+                  Clientes satisfeitos
+                </div>
               </div>
             </div>
 
             {/* Call to actions */}
-            {/* Call to actions */}
-<div className="flex flex-col sm:flex-row gap-4">
-  <Button
-    onClick={scrollToCardapio}
-    size="lg"
-    className="bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white px-8 py-4 cursor-pointer transition-transform transform hover:scale-105"
-  >
-    Ver Cardápio
-  </Button>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                onClick={scrollToCardapio}
+                size="lg"
+                className="bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white px-8 py-4 cursor-pointer transition-transform transform hover:scale-105"
+              >
+                Ver Cardápio
+              </Button>
 
-  <Button
-    onClick={scrollToContato}
-    size="lg"
-    className="bg-white text-rose-600 border border-rose-300 hover:bg-rose-100 px-8 py-4 cursor-pointer transition-transform transform hover:scale-105"
-  >
-    Solicitar Orçamento
-  </Button>
-</div>
-
+              <Button
+                onClick={scrollToContato}
+                size="lg"
+                className="bg-white text-rose-600 border border-rose-300 hover:bg-rose-100 px-8 py-4 cursor-pointer transition-transform transform hover:scale-105"
+              >
+                Solicitar Orçamento
+              </Button>
+            </div>
           </div>
 
           {/* Imagem hero */}
@@ -107,10 +114,16 @@ export function HeroSection() {
                 <div className="flex items-center gap-2">
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={14} className="text-yellow-400 fill-current" />
+                      <Star
+                        key={i}
+                        size={14}
+                        className="text-yellow-400 fill-current"
+                      />
                     ))}
                   </div>
-                  <span className="text-sm font-semibold text-gray-700">5.0</span>
+                  <span className="text-sm font-semibold text-gray-700">
+                    5.0
+                  </span>
                 </div>
               </div>
             </div>
