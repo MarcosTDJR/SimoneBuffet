@@ -7,8 +7,9 @@ import { ContactSection } from "./components/ContactSection";
 import { Footer } from "./components/Footer";
 import { PhotoGallery } from "./components/Photos";
 
-// Definição do tipo MenuItem
 export type MenuItem = {
+  preco: ReactNode;
+  nome: ReactNode;
   id: string;
   name: string;
   description: string;
@@ -20,11 +21,15 @@ export default function Home() {
   const [carrinho, setCarrinho] = useState<MenuItem[]>([]);
 
   const adicionarAoCarrinho = (item: MenuItem) => {
-    setCarrinho(prev => [...prev, item]);
+    const novoItem = {
+      ...item,
+      id: `${item.id}-${Date.now()}-${Math.random()}`,
+    };
+    setCarrinho((prev) => [...prev, novoItem]);
   };
 
   const removerDoCarrinho = (id: string) => {
-    setCarrinho(prev => prev.filter(item => item.id !== id));
+    setCarrinho((prev) => prev.filter((item) => item.id !== id));
   };
 
   return (

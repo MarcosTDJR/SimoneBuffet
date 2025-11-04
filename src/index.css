@@ -3096,6 +3096,17 @@
       color: var(--rose-400);
     }
   }
+  
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #fb7185; /* rosa médio */
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-track {
+  background-color: #ffe4e6; /* rosa claro */
+}
 
   @media (hover: hover) {
     .hover\:text-rose-600:hover {
