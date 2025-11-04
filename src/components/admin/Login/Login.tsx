@@ -20,6 +20,7 @@ import codigoIcon from "/Icons/codigoIcon.png";
 import iconeErroCodigo from "/Icons/iconeErroCodigo.png";
 import fundoCinzaDireita from "/Icons/fundoCinzaDireita.png";
 
+
 interface LoginProps {
   onLogin: (usuario: string, senha: string) => void;
 }

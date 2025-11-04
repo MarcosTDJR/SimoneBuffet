@@ -6,8 +6,9 @@ const galeriaIcon = "/Icons/galeria.png";
 const mensagemIcon = "/Icons/mensagem.png";
 const garfoFacaBlackIcon = "/Icons/garfo-faca-black.png";
 const galeriaBlackIcon = "/Icons/galeria-black.png";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
-import fundo from "/Icons/rectangle 19.png";
 
 
 interface AdminHomeProps {
@@ -28,7 +29,7 @@ const AdminHome: React.FC<AdminHomeProps> = ({
   onNavigateTo,
 }) => {
 return (
-  <div className="navbar" style={{ backgroundImage: `url(${fundo})` }}>
+  <div className="navbar">
     <div className="dashboard-content">
       
       <div className="welcome-card">
@@ -117,7 +118,21 @@ return (
     </section>
 
   </div>
+
+  <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
+        
   </div>
+  
 );
 };
 

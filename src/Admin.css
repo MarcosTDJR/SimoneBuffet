@@ -41,13 +41,13 @@
 
 .login-box input:focus {
     outline: none;
-    border-color: #4299e1;
+    border-color: #e91e63;
     box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
 }
 
 .login-box button {
     width: 100%;
-    background: #4299e1;
+    background: #e91e63;
     color: white;
     border: none;
     padding: 0.75rem;
@@ -59,7 +59,7 @@
 }
 
 .login-box button:hover {
-    background: #3182ce;
+    background: #e91e63;
     transform: translateY(-1px);
 }
 
@@ -256,12 +256,12 @@
 
 .category-form input:focus {
     outline: none;
-    border-color: #4299e1;
+    border-color: #e91e63;
     box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
 }
 
 .category-form button {
-    background: #4299e1;
+    background: #e91e63;
     color: white;
     border: none;
     padding: 0.75rem;
@@ -273,7 +273,7 @@
 }
 
 .category-form button:hover {
-    background: #3182ce;
+    background: #e91e63;
 }
 
 .categories-container ul {

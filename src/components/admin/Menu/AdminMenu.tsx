@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "./MenuModules.css";
+import "react-toastify/dist/ReactToastify.css";
+import { toast, ToastContainer } from "react-toastify";
 
 interface Prato {
   id: string;
@@ -46,7 +48,7 @@ const AdminMenu: React.FC<AdminMenuProps> = ({
   const adicionarPrato = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!novoPrato.nome || !novoPrato.preco || !novoPrato.categoriaId) {
-      alert("Preencha todos os campos!");
+      toast.info("Preencha todos os campos!");
       return;
     }
     await onAddPrato({
@@ -55,13 +57,13 @@ const AdminMenu: React.FC<AdminMenuProps> = ({
       categoriaId: novoPrato.categoriaId,
     });
     setNovoPrato({ nome: "", preco: "", categoriaId: "" });
-    alert("✅ Prato adicionado com sucesso!");
+    toast.success("✅ Prato adicionado com sucesso!");
   };
 
   const salvarEdicao = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editandoPratoId || !pratoEditado.nome || !pratoEditado.preco || !pratoEditado.categoriaId) {
-      alert("Preencha todos os campos!");
+      toast.info("Preencha todos os campos!");
       return;
     }
     await onEditPrato(editandoPratoId, {
@@ -171,6 +173,18 @@ const AdminMenu: React.FC<AdminMenuProps> = ({
           </ul>
         )}
       </div>
+
+      <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+              />
     </div>
   );
 };
