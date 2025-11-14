@@ -53,7 +53,7 @@
   height: 65vh;
   max-height: 80vh; /* MUDANÇA: adiciona altura máxima */
   background: rgba(255, 255, 255, 0.114);
-  
+  backdrop-filter: blur(6px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 0 40px 40px 0;
   box-shadow: 0 4px 20px 0 rgba(255,2,2,0.25);
@@ -67,6 +67,11 @@
   overflow-y: auto; /* MUDANÇA: adiciona scroll */
   overflow-x: hidden; /* MUDANÇA: evita scroll horizontal */
 }
+
+.login-box::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Opera */
+}
+
 
 /* --- ELEMENTOS DECORATIVOS --- */
 
@@ -91,9 +96,9 @@
 
 .animacao-salada {
   position: absolute;
-  top: -3vh;
-  right: 2vw;
-  width: 250px;
+  top: -1vh;
+  right: 20vw;
+  width: 300px;
   height: auto;
   z-index: 3;
   transform: rotate(180deg);
@@ -102,7 +107,7 @@
 .fruit-salad-pana {
   position: absolute;
   bottom: 0;
-  right: -5.5vw;
+  right: -3.5vw;
   width: 350px;
   height: auto;
   z-index: 3;
@@ -112,7 +117,7 @@
 .healthy-food-bro {
   position: absolute;
   bottom: 10px;
-  right: 40.5vw;
+  right: 36.5vw;
   width: 300px;
   height: auto;
   z-index: 3;
@@ -644,14 +649,18 @@
   -webkit-backdrop-filter: blur(100px);
   border: 2.5px solid rgba(255, 255, 255, 0.763);
   border-radius: 23px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
-  padding: 30px;
-  max-width: 350px; /* MUDANÇA: de 400px para 350px */
-  width: 41%; /* MUDANÇA: de 45% para 35% */
+  padding: 100px;
+  max-width: 360px !important; /* ✅ MUDANÇA: de 350px para 280px + !important */
   max-height: 55vh;
-  overflow-y: auto;
+  overflow-y: hidden !important; /* ✅ MUDANÇA: scroll hidden */
+  overflow-x: hidden !important; /* ✅ ADIÇÃO: previne scroll horizontal */
   text-align: center;
   animation: modalUpTremor 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* ✅ ADIÇÃO: Esconde scrollbar caso apareça */
+.modal-content::-webkit-scrollbar {
+  display: none;
 }
 
 
@@ -1050,7 +1059,8 @@
 
 /* --- RESPONSIVIDADE ORGANIZADA --- */
 
-/* Desktop padrão (acima de 1200px) */
+/* 1 */
+/* Desktop padrão (acima de 1201px) - COM VALORES FLUIDOS */
 @media (min-width: 1201px) {
   .login-container {
     display: flex;
@@ -1074,13 +1084,14 @@
     right: 5%;
     top: 50%;
     transform: translateY(-50%);
-    width: 35vw;
-    max-width: 500px;
+    width: clamp(35vw, 38vw, 42vw); /* MUDANÇA: se adapta sozinho */
+    max-width: 520px;
     min-width: 400px;
+    padding: clamp(40px, 4.5vw, 60px); /* MUDANÇA: padding fluido */
   }
   
   .titulo-camadas {
-    top: 50%;
+    top: 63%;
     left: 25%;
     width: 400px;
     height: 150px;
@@ -1091,38 +1102,126 @@
   .imone-texto {
     font-size: 6.3rem;
   }
-}
-
+  
+  .login-box h1 {
+    font-size: clamp(2.3rem, 2.55vw, 2.8rem); /* MUDANÇA: cresce suave */
+  }
+  
+  /* ETAPA 2 - valores fluidos */
+  .login-box .painel-recuperacao .input-group {
+    margin-top: clamp(58px, 6.8vw, 76px); /* MUDANÇA: espaço adaptativo */
+    margin-bottom: clamp(16px, 1.8vw, 20px);
+  }
+  
+  .login-box .painel-recuperacao input {
+    width: clamp(82%, 85%, 88%); /* MUDANÇA: largura fluida */
+    padding: clamp(8px, 1vw, 10px) clamp(36px, 3.8vw, 40px);
+    font-size: clamp(1.05rem, 1.12vw, 1.15rem);
+  }
+  
+  .login-box .painel-recuperacao .input-group label {
+    margin-left: clamp(40px, 5.2vw, 62px); /* MUDANÇA: alinha sozinho */
+    margin-bottom: clamp(6px, 0.9vw, 10px);
+    font-size: clamp(14px, 1.25vw, 16px);
+  }
+  
+  .painel-recuperacao .acoes-recuperacao {
+    max-width: clamp(440px, 35vw, 640px);
+    gap: clamp(10px, 1.4vw, 16px);
+    padding: 0 clamp(12px, 1.8vw, 18px);
+    justify-content: space-between;
+  }
+  
+  .painel-recuperacao .btn-enviar-codigo {
+    width: clamp(150px, 15.5vw, 165px);
+    height: clamp(40px, 4.2vh, 44px);
+    font-size: clamp(0.95rem, 1vw, 1.05rem);
+  }
+  
+  .painel-recuperacao .btn-voltar-recuperacao {
+    width: clamp(110px, 12vw, 125px);
+    height: clamp(40px, 4.2vh, 44px);
+    font-size: clamp(0.95rem, 1vw, 1.05rem);
+  }
+  
+  /* ETAPA 3 - Código */
   .painel-codigo .btn-enviar {
     justify-content: space-between;
-    max-width: 640px;
-    gap: 12px;
-    padding: 0 15px;
+    max-width: clamp(560px, 60vw, 640px);
+    gap: clamp(10px, 1.4vw, 16px);
+    padding: 0 clamp(12px, 1.8vw, 18px);
   }
   
   .login-box button.btn-voltar-codigo {
-    width: 140px;
-    height: 40px;
-    font-size: 1rem;
+    width: clamp(130px, 14vw, 145px);
+    height: clamp(40px, 4.2vh, 44px);
+    font-size: clamp(0.95rem, 1vw, 1.05rem);
   }
   
-  /* ADIÇÃO: Modal responsivo - Desktop */
+  /* Modal */
   .modal-overlay {
-    padding: 40px;
+    padding: clamp(30px, 4vw, 45px);
   }
   
   .modal-content {
-    max-width: 450px;
+    max-width: clamp(380px, 42vw, 450px);
     width: auto;
-    padding: 40px;
+    padding: clamp(32px, 4vw, 42px);
   }
   
   .modal-content .icone-erro-codigo {
-    width: 180px;
-    height: 180px;
+    width: clamp(150px, 17vw, 180px);
+    height: clamp(150px, 17vw, 180px);
   }
+}
+ 
+/* Ícone - 1201px a 1400px */
+@media (min-width: 1201px) and (max-width: 1400px) {
+  .login-box .painel-recuperacao .input-group .icon-senha {
+    left: 50px !important;
+    bottom: 26px;
+    width: 20px;
+    height: 20px;
+    transform: none;
+  }
+  
+  .login-box .painel-recuperacao input {
+    padding-left: 38px;
+  }
+}
+
+/* Ícone - 1401px a 1700px */
+@media (min-width: 1401px) and (max-width: 1700px) {
+  .login-box .painel-recuperacao .input-group .icon-senha {
+    left: 57px !important;
+    bottom: 26px;
+    width: 21px;
+    height: 21px;
+    transform: none;
+  }
+  
+  .login-box .painel-recuperacao input {
+    padding-left: 40px;
+  }
+}
+
+/* Ícone - 1701px+ */
+@media (min-width: 1701px) {
+  .login-box .painel-recuperacao .input-group .icon-senha {
+    left: 69px !important;
+    bottom: 25px;
+    width: 23px;
+    height: 23px;
+    transform: none;
+  }
+  
+  .login-box .painel-recuperacao input {
+    padding-left: 45px;
+  }
+}
 
 /* Laptops grandes (até 1200px) */
+/* 2 */
 @media (max-width: 1200px) {
   .login-box {
     width: 45vw;
@@ -1163,6 +1262,13 @@
     padding: 35px;
   }
   
+  .titulo-camadas {
+    top: 63%;
+    left: 25%;
+    width: 400px;
+    height: 150px;
+  }yy
+  
   .modal-content .icone-erro-codigo {
     width: 160px;
     height: 160px;
@@ -1177,15 +1283,12 @@
 
 
 /* Tablets e telas médias (até 1024px) */
+/* 3 */
 @media (max-width: 1024px) {
   .login-container {
     flex-direction: column;
     background-position: center;
     background-size: cover;
-  }
-  
-  .left-side-container {
-    display: none;
   }
   
   .quadrado-imagem {
@@ -1215,24 +1318,19 @@
     overflow-y: auto;
     z-index: 100;
   }
+
+  .login-box .painel-recuperacao .input-group .icon-senha {
+    left: 62px !important;
+    bottom: 26px !important;
+    width: 23px !important;
+    height: 23px !important;
+    transform: none;
+  }
   
   .login-box h1 {
     font-size: 2rem;
   }
   
-  .detalhe-azeite,
-  .tempero,
-  .animacao-salada,
-  .fruit-salad-pana,
-  .healthy-food-bro {
-    display: none;
-  }
-  
-  .titulo-camadas {
-    top: 15%;
-    left: 50%;
-    transform: translateX(-50%);
-  }
   
   .buffet-principal,
   .s-grande-destaque,
@@ -1256,8 +1354,7 @@
     font-size: 1rem;
     margin: 0;
   }
-  
-  /* ADIÇÃO: Modal responsivo - Tablets */
+
   .modal-overlay {
     padding: 25px;
   }
@@ -1280,12 +1377,21 @@
 }
 
 /* Tablets pequenos (até 768px) */
+/* 4 */
 @media (max-width: 768px) {
   .login-box {
     width: 90vw;
     max-width: 400px;
     padding: 25px 20px;
     max-height: 85vh;
+  }
+
+  .login-box .painel-recuperacao .input-group .icon-senha {
+    left: 52px !important;
+    bottom: 26px !important;
+    width: 23px !important;
+    height: 23px !important;
+    transform: none;
   }
   
   .login-box h1 {
@@ -1375,6 +1481,7 @@
   }
 }
 
+/* 5 */
 @media (min-width: 481px) and (max-width: 768px) {
   /* ETAPA 3 - Layout intermediário */
   .painel-codigo .btn-enviar {
@@ -1390,9 +1497,18 @@
     height: 50px;
     margin: 0;
   }
+
+  .login-box button.entrar {
+    width: 100%;
+    justify-content: center;
+    top: -10%;
+    padding: 0;
+    height: 50px;
+  }
 }
 
 /* Smartphones (até 480px) */
+/* 6 */
 @media (max-width: 480px) {
   .login-box {
     width: 95vw;
@@ -1491,6 +1607,7 @@
 }
 
 /* Smartphones pequenos (até 360px) */
+/* 7 */
 @media (max-width: 360px) {
   .login-box {
     padding: 16px 12px;
@@ -1546,6 +1663,7 @@
 }
 
 /* Landscape em smartphones */
+/* 8 */
 @media (max-height: 500px) and (orientation: landscape) {
   .login-box {
     max-height: 95vh;
@@ -1608,192 +1726,8 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-/* Desktop padrão (acima de 1500px) */
-@media (min-width: 1401px) {
-  .login-box .painel-recuperacao .input-group label {
-    margin-left: 60px !important; /* ← AJUSTE aqui */
-    margin-bottom: 8px;   /* ← e aqui */
-    font-size: 15px;      /* ← e aqui também */
-  }
-
-  .login-box .painel-recuperacao .acoes-recuperacao {
-  max-width: 640px;
-  gap: 0;
-  padding: 0;
-  justify-content: space-between !important; /* FORÇA a regra */
-}
-
-  .login-container {
-    display: flex;
-    position: relative;
-  }
-  
-  .left-side-container {
-    flex: 1;
-    position: relative;
-  }
-  
-  .quadrado-imagem {
-    flex: 1;
-    position: relative;
-    width: auto;
-    right: auto;
-  }
-  
-  .login-box {
-    position: absolute;
-    right: 5%;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 35vw;
-    max-width: 500px;
-    min-width: 400px;
-  }
-  
-  .titulo-camadas {
-    top: 50%;
-    left: 25%;
-    width: 400px;
-    height: 150px;
-  }
-  
-  .buffet-principal,
-  .s-grande-destaque,
-  .imone-texto {
-    font-size: 6.3rem;
-  }
-  
-  /* ADIÇÃO: h1 responsivo - Desktop */
-  .login-box h1 {
-    font-size: 2.8rem; /* MANTÉM: tamanho original */
-  }
-  
-  /* CORREÇÃO: Ícone do email - Desktop */
-  .login-box .painel-recuperacao .input-group .icon-senha {
-    left: 13px !important; /* Use !important ou aumente especificidade */
-    bottom: 12.4px;
-    width: 24px;
-    height: 24px;
-  }
-
-  
-  /* ADIÇÃO: Responsividade ETAPA 2 - Desktop */
-.painel-recuperacao .acoes-recuperacao {
-  max-width: 640px;
-  gap: 0; /* MUDANÇA: remove gap */
-  padding: 0; /* MUDANÇA: remove padding */
-  justify-content: space-between; /* FORÇA: extremidades */
-}
-  
-  .painel-recuperacao .btn-enviar-codigo,
-  .painel-recuperacao .btn-voltar-recuperacao {
-    height: 40px;
-    font-size: 1rem;
-  }
-  
-  .painel-recuperacao .btn-enviar-codigo {
-    width: 160px;
-  }
-  
-  .painel-recuperacao .btn-voltar-recuperacao {
-    width: 120px;
-  }
-}
-
-/* Desktop padrão (acima de 1200px) */
-@media (min-width: 1201px) {
-  .login-box .painel-recuperacao .input-group label {
-    margin-left: 40px;    /* ← AJUSTE aqui */
-    margin-bottom: 8px;   /* ← e aqui */
-    font-size: 15px;      /* ← e aqui também */
-  }
-  
-  .login-container {
-    display: flex;
-    position: relative;
-  }
-  
-  .left-side-container {
-    flex: 1;
-    position: relative;
-  }
-  
-  .quadrado-imagem {
-    flex: 1;
-    position: relative;
-    width: auto;
-    right: auto;
-  }
-  
-  .login-box {
-    position: absolute;
-    right: 5%;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 35vw;
-    max-width: 500px;
-    min-width: 400px;
-  }
-  
-  .titulo-camadas {
-    top: 50%;
-    left: 25%;
-    width: 400px;
-    height: 130px;
-  }
-  
-  .buffet-principal,
-  .s-grande-destaque,
-  .imone-texto {
-    font-size: 6.3rem;
-  }
-  
-  /* ADIÇÃO: h1 responsivo - Desktop */
-  .login-box h1 {
-    font-size: 2.5rem; /* MANTÉM: tamanho original */
-  }
-  
-  /* CORREÇÃO: Ícone do email - Desktop */
-  .login-box .painel-recuperacao .input-group .icon-senha {
-    left: -5px;
-    bottom: 10px;
-    width: 22px;
-    height: 22px;
-  }
-  
-  /* ADIÇÃO: Responsividade ETAPA 2 - Desktop */
-  .painel-recuperacao .acoes-recuperacao {
-    max-width: 450px;
-    gap: 12px;
-    padding: 0 15px;
-  }
-  
-  .painel-recuperacao .btn-enviar-codigo,
-  .painel-recuperacao .btn-voltar-recuperacao {
-    height: 40px;
-    font-size: 1rem;
-  }
-  
-  .painel-recuperacao .btn-enviar-codigo {
-    width: 160px;
-  }
-  
-  .painel-recuperacao .btn-voltar-recuperacao {
-    width: 120px;
-  }
-}
-
 /* Laptops grandes (até 1200px) */
+/* 11 */
 @media (max-width: 1200px) {
     .login-box .painel-recuperacao .input-group label {
     margin-left: 30px;    /* ← AJUSTE aqui */
@@ -1856,6 +1790,7 @@
 }
 
 /* ADIÇÃO: Breakpoint intermediário para resolver sobreposição */
+/* 12 */
 @media (max-width: 1100px) {
   .login-box h1 {
     font-size: 2rem; /* REDUÇÃO: evita sobreposição */
@@ -1867,6 +1802,7 @@
 }
 
 /* Tablets e telas médias (até 1024px) */
+/* 13 */
 @media (max-width: 1024px) {
   .login-container {
     flex-direction: column;
@@ -1985,6 +1921,7 @@
 }
 
 /* Tablets pequenos (até 768px) */
+/* 14 */
 @media (max-width: 768px) {
   .login-box {
     width: 90vw;
@@ -2070,6 +2007,7 @@
   }
 }
 
+/* 15 */
 @media (min-width: 481px) and (max-width: 768px) {
   /* ADIÇÃO: Responsividade ETAPA 2 - Tablets pequenos */
   .login-box .painel-recuperacao .input-group {
@@ -2118,6 +2056,7 @@
 
 
 /* Smartphones (até 480px) */
+/* 16 */
 @media (max-width: 480px) {
   .login-box {
     width: 95vw;
@@ -2209,6 +2148,7 @@
 }
 
 /* Smartphones pequenos (até 360px) */
+/* 17 */
 @media (max-width: 360px) {
   .login-box {
     padding: 16px 12px;
@@ -2262,6 +2202,7 @@
 }
 
 /* Landscape em smartphones */
+/* 18 */
 @media (max-height: 500px) and (orientation: landscape) {
   .login-box {
     max-height: 95vh;

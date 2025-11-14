@@ -5,6 +5,7 @@ import { MenuSection } from "./components/MenuSection";
 import { AboutSection } from "./components/AboutSection";
 import { ContactSection } from "./components/ContactSection";
 import { Footer } from "./components/Footer";
+import { FaqSection } from "./components/FaqSection";
 import { PhotoGallery } from "./components/Photos";
 
 export type MenuItem = {
@@ -41,6 +42,7 @@ export default function Home() {
         <AboutSection />
         <ContactSection />
         <PhotoGallery />
+        <FaqSection />
       </main>
       <Footer />
     </div>

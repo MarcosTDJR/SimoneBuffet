@@ -105,6 +105,13 @@ export function Header({ carrinho, removerDoCarrinho }: HeaderProps) {
             Contato
           </button>
 
+          <button
+                onClick={() => scrollToSection("faq")}
+                className="text-left text-lg text-gray-700 hover:text-rose-600 transition-colors"
+              >
+                FAQ
+              </button>
+              
           {/* Botão do carrinho */}
           <div className="relative">
             <Button

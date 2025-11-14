@@ -155,6 +155,7 @@
     background: #e91e63;
     border-radius: 50%;
     margin-top: 6px;
+    flex-shrink: 0; /* ✅ ADICIONADO: evita que o bullet encolha */
 }
 
 
@@ -234,58 +235,169 @@
     font-weight: 600;
 }
 
-@media (max-width: 768px) {
-    .actions-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
+/* ===== RESPONSIVIDADE ===== */
 
+/* Tablets (768px - 1024px) */
+@media (max-width: 1024px) {
+    .navbar {
+        padding: 120px 16px 40px; /* ✅ Reduz padding top */
+    }
+    
+    .dashboard-content {
+        border-radius: 16px; /* ✅ Border radius menor */
+    }
+    
     .stats-container {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
-        padding: 0;
+        grid-template-columns: repeat(2, 1fr); /* ✅ 2 colunas */
+        gap: 16px;
+        margin: 20px;
     }
     
-    .stats-card {
-        padding: 1rem;
+    .welcome-card {
+        padding: 24px; /* ✅ Reduz padding */
     }
     
-    .stats-card h3 {
-        font-size: 0.8rem;
+    .welcome-card h2 {
+        font-size: 1.3rem;
     }
     
-    .stats-card p {
-        font-size: 1.5rem;
+    .welcome-card h1 {
+        font-size: 0.9rem;
+    }
+}
+
+/* Mobile Grande (481px - 767px) */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 100px 12px 30px; /* ✅ Ainda menos padding */
+    }
+    
+    .dashboard-content {
+        border-radius: 12px;
+    }
+    
+    .welcome-card {
+        padding: 20px;
+    }
+    
+    .welcome-card h2 {
+        font-size: 1.2rem;
+    }
+    
+    .welcome-card h1 {
+        font-size: 0.85rem;
+    }
+    
+    .stats-container {
+        grid-template-columns: repeat(2, 1fr); /* ✅ 2 colunas */
+        gap: 12px;
+        margin: 16px;
+    }
+    
+    .stats-card-content p {
+        font-size: 1.5rem; /* ✅ Número menor */
     }
     
     .activities-section,
     .quick-actions {
-        margin: 1rem 0;
-        padding: 1.5rem;
+        margin: 0 16px 16px 16px; /* ✅ Menos margem */
     }
     
-    .quick-actions {
-        flex-direction: column;
-        align-items: center;
+    .activities-list {
+        padding: 12px;
     }
     
-    .quick-actions button {
-        width: 100%;
-        max-width: 300px;
+    .activity-text {
+        font-size: 0.85rem; /* ✅ Texto menor */
+    }
+    
+    .actions-grid {
+        grid-template-columns: 1fr; /* ✅ 1 coluna em mobile */
+        gap: 12px;
+        padding: 16px;
     }
 }
 
+/* Mobile Pequeno (até 480px) */
 @media (max-width: 480px) {
+    .navbar {
+        padding: 80px 8px 20px; /* ✅ Padding mínimo */
+    }
+    
+    .dashboard-content {
+        border-radius: 8px;
+    }
+    
+    .welcome-card {
+        padding: 16px;
+    }
+    
+    .welcome-card h2 {
+        font-size: 1.1rem;
+    }
+    
+    .welcome-card h1 {
+        font-size: 0.8rem;
+    }
+    
     .stats-container {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr; /* ✅ 1 coluna */
+        gap: 10px;
+        margin: 12px;
     }
     
-    .activities-section h2 {
-        font-size: 1.25rem;
+    .stats-card-header {
+        font-size: 0.75rem;
+        padding: 10px 12px;
     }
     
-    .activities-section li {
-        font-size: 0.9rem;
-        padding: 0.5rem 0;
+    .stats-card-content {
+        padding: 16px;
+    }
+    
+    .stats-card-content p {
+        font-size: 1.3rem;
+    }
+    
+    .activities-section,
+    .quick-actions {
+        margin: 0 12px 12px 12px;
+    }
+    
+    .activities-header,
+    .actions-header {
+        font-size: 0.75rem;
+        padding: 10px 12px;
+    }
+    
+    .activities-list {
+        padding: 10px;
+        gap: 8px;
+    }
+    
+    .activity-item {
+        padding: 10px 12px;
+    }
+    
+    .activity-text {
+        font-size: 0.8rem;
+    }
+    
+    .actions-grid {
+        padding: 12px;
+        gap: 10px;
+    }
+    
+    .action-button {
+        padding: 16px;
+    }
+    
+    .action-button img {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .action-button span {
+        font-size: 0.85rem;
     }
 }
