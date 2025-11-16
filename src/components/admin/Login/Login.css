@@ -647,18 +647,17 @@
   background: rgb(240, 234, 234);
   backdrop-filter: blur(100px);
   -webkit-backdrop-filter: blur(100px);
-  border: 2.5px solid rgba(255, 255, 255, 0.763);
+  border: 2.5px solid rgba(247, 65, 65, 0.763);
   border-radius: 23px;
   padding: 100px;
-  max-width: 360px !important; /* ✅ MUDANÇA: de 350px para 280px + !important */
-  max-height: 55vh;
-  overflow-y: hidden !important; /* ✅ MUDANÇA: scroll hidden */
-  overflow-x: hidden !important; /* ✅ ADIÇÃO: previne scroll horizontal */
+  max-width: 360px !important; 
+  max-height: 48vh;
+  overflow-y: hidden !important; 
+  overflow-x: hidden !important; 
   text-align: center;
-  animation: modalUpTremor 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  animation: modalUpTremor 0.6s cubic-bezier(.36,.07,.19,.97) both;
 }
 
-/* ✅ ADIÇÃO: Esconde scrollbar caso apareça */
 .modal-content::-webkit-scrollbar {
   display: none;
 }
@@ -779,7 +778,7 @@
 .painel-nova-senha .toggle-senha {
   position: absolute;
   right: 10px;
-  top: 50%;
+  top: 40%;
   width: 38px;
   height: 20px;
   cursor: pointer;
@@ -847,7 +846,6 @@
   transform: translateY(-2px);
   background: linear-gradient(135deg, #e91e63, #ad1457);
 }
-
 
 /* ---------------------------------------------------------------- Fim ETAPA 4 (NOVA SENHA) -------------------------------------------------------------- */
 
@@ -977,10 +975,6 @@
   background: linear-gradient(#e91e63, #ad1457);
 }
 
-
-
-
-/* Header com ícone centralizado */
 .codigo-header {
   display: flex;
   justify-content: center;
@@ -995,7 +989,6 @@
 /* Container dos inputs de código */
 .codigo-container {
   width: 100%;
-  margin-bottom: 30px;
   max-width: 360px;
   margin: 0 auto 30px auto;
 }
@@ -1016,7 +1009,7 @@
   border: 3px solid #e91e63;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.9);
-  color: #2c2c2c;
+  color: #000000 !important;
   caret-color: #e91e63;
   transition: border-color 0.3s ease, background 0.3s ease, transform 0.2s ease; /* MUDANÇA: transição específica */
   box-shadow: 0 2px 8px rgba(233, 30, 99, 0.15);
@@ -1026,7 +1019,7 @@
   outline: none;
   border-color: #ad1457;
   background: #fff;
-  color: #ad1457;
+  color: #000 !important;
   transform: scale(1.08);
   box-shadow: 0 4px 16px rgba(233, 30, 99, 0.25);
 }
@@ -1147,7 +1140,7 @@
   /* ETAPA 3 - Código */
   .painel-codigo .btn-enviar {
     justify-content: space-between;
-    max-width: clamp(560px, 60vw, 640px);
+    max-width: clamp(500px, 60vw, 640px);
     gap: clamp(10px, 1.4vw, 16px);
     padding: 0 clamp(12px, 1.8vw, 18px);
   }
@@ -1267,7 +1260,7 @@
     left: 25%;
     width: 400px;
     height: 150px;
-  }yy
+  }
   
   .modal-content .icone-erro-codigo {
     width: 160px;
@@ -1360,19 +1353,23 @@
   }
   
   .modal-content {
-    max-width: 380px;
-    width: 90%;
+    max-width: 180px;
+    width: 70%;
     padding: 30px 25px;
-    max-height: 85vh;
+    max-height: 40vh;
   }
   
   .modal-content h2 {
-    font-size: 1.4rem;
+    font-size: 1rem;
+  }
+
+  .modal-content p {
+    font-size: 1rem;
   }
   
   .modal-content .icone-erro-codigo {
-    width: 140px;
-    height: 140px;
+    width: 100px;
+    height: 100px;
   }
 }
 
@@ -1404,6 +1401,7 @@
     padding: 12px 50px 12px 40px;
     height: 48px;
     box-sizing: border-box;
+    color: #000 !important;
   }
   
   .login-box button {
@@ -1446,7 +1444,6 @@
     margin: 0 auto;
   }
   
-  /* ADIÇÃO: Modal responsivo - Tablets pequenos */
   .modal-overlay {
     padding: 20px;
   }
@@ -1499,11 +1496,22 @@
   }
 
   .login-box button.entrar {
-    width: 100%;
+    width: 40%;
     justify-content: center;
     top: -10%;
     padding: 0;
     height: 50px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1025px) {
+  .login-box button.entrar {
+    width: 180px;
+    justify-content: center;
+    padding-left: 15px;
+    gap: 12px;
+    height: 48px;
+    top: auto; /* Remove o top: -10% */
   }
 }
 
@@ -1526,6 +1534,7 @@
   .login-box input {
     font-size: 16px;
     padding: 14px 45px 14px 35px;
+    color: #000 !important;
   }
   
   .login-box .input-group {
@@ -1549,6 +1558,7 @@
     width: 40px;
     height: 55px;
     font-size: 1.5rem;
+    color: #000000 !important;
   }
   
   .codigo-inputs {
@@ -1560,10 +1570,11 @@
   }
   
   .painel-codigo .btn-enviar {
-    flex-direction: column;
-    gap: 15px;
-    padding: 0 25px;
+    flex-direction: row;
+    gap: 35px;
+    padding: 0 35px;
     margin: 30px auto 0 auto;
+    width: 430px;
   }
   
   .login-box button.btn-voltar-codigo {
@@ -1621,6 +1632,7 @@
     width: 35px;
     height: 50px;
     font-size: 1.3rem;
+    color: #000000 !important;
   }
   
   .codigo-inputs {
@@ -1940,6 +1952,7 @@
     padding: 12px 50px 12px 40px;
     height: 48px;
     box-sizing: border-box;
+    color: #000 !important;
   }
   
   .login-box button {
@@ -2074,6 +2087,7 @@
   .login-box input {
     font-size: 16px;
     padding: 14px 45px 14px 35px;
+    color: #000 !important;
   }
   
   .login-box .input-group {
@@ -2097,6 +2111,7 @@
     width: 40px;
     height: 55px;
     font-size: 1.5rem;
+    color: #000 !important;
   }
   
   .codigo-inputs {
@@ -2155,23 +2170,23 @@
   }
   
   .login-box h1 {
-    font-size: 1.2rem; /* REDUÇÃO: de 1.3rem para 1.2rem */
+    font-size: 1.2rem;
   }
   
   .input-codigo {
     width: 35px;
     height: 50px;
     font-size: 1.3rem;
+    color: #000000 !important;
   }
   
   .codigo-inputs {
     gap: 10px;
   }
   
-  /* ADIÇÃO: Responsividade ETAPA 2 - Smartphones pequenos */
   .login-box .painel-recuperacao .input-group {
     margin-bottom: 25px;
-    margin-top: 30px; /* REDUÇÃO: menos espaço no topo */
+    margin-top: 30px; 
   }
   
   .login-box .painel-recuperacao input {
@@ -2184,7 +2199,6 @@
     font-size: 13px;
   }
   
-  /* CORREÇÃO: Ícone do email - Smartphones pequenos */
   .login-box .painel-recuperacao .input-group .icon-senha {
     left: 8px;
     bottom: 10px;
@@ -2201,7 +2215,6 @@
   }
 }
 
-/* Landscape em smartphones */
 /* 18 */
 @media (max-height: 500px) and (orientation: landscape) {
   .login-box {
@@ -2211,7 +2224,7 @@
   }
   
   .login-box h1 {
-    font-size: 1.3rem; /* REDUÇÃO: para landscape */
+    font-size: 1.3rem;
     margin-bottom: 10px;
   }
   
@@ -2219,13 +2232,11 @@
     display: none;
   }
   
-  /* ADIÇÃO: Responsividade ETAPA 2 - Landscape */
   .login-box .painel-recuperacao .input-group {
     margin-bottom: 15px;
-    margin-top: 15px; /* REDUÇÃO: muito menos espaço no topo */
+    margin-top: 15px; 
   }
   
-  /* CORREÇÃO: Ícone do email - Landscape */
   .login-box .painel-recuperacao .input-group .icon-senha {
     left: 10px;
     bottom: 12px;
@@ -2246,5 +2257,34 @@
     max-width: 140px;
     height: 40px;
     font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .codigo-inputs {
+    display: flex;
+    justify-content: center;
+    align-items: center !important;
+    gap: 16px;
+  }
+
+  .input-codigo,
+  .codigo-inputs .input-codigo {
+    box-sizing: border-box !important;
+    display: inline-block !important;
+    -webkit-appearance: none;
+    height: 58px !important; 
+    min-height: 28px !important; 
+    padding: 30px 19px !important; 
+    font-size: 1.1rem !important;
+    text-align: center !important;
+    color: #000 !important;
+    -webkit-text-fill-color: #000 !important;
+  }
+
+  .painel-codigo input,
+  .painel-codigo .input-codigo {
+    height: 18px !important;
+    min-height: 48px !important;
   }
 }
