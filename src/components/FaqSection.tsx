@@ -144,28 +144,30 @@ export function FaqSection() {
           {faq.question}
         </span>
 
-        <div 
-          style={{
-            position: "absolute",
-            right: "22px",
-            top: "-9px", 
-            zIndex: 10
-          }}
-          className="flex-shrink-0"
-        >
-          <ImageWithFallback
-            src={
-              isOpen
-                ? "/Icons/CollapseRoseCima.png"
-                : "/Icons/CollapseRoseBaixo.png"
-            }
-            alt="Ícone de expandir/recolher"
-            className="w-16 h-16 transition-all duration-500 cursor-pointer"
+          <div 
             style={{
-              transform: isOpen ? "rotate(180deg)" : "rotate(-180deg)"
+              position: "absolute",
+              right: "22px",
+              top: "-9px", 
+              zIndex: 10
             }}
-          />
-        </div>
+            className="flex-shrink-0"
+          >
+            <ImageWithFallback
+              src={
+                isOpen
+                  ? "/Icons/CollapseRoseCima.png"
+                  : "/Icons/CollapseRoseBaixo.png"
+              }
+              alt="Ícone de expandir/recolher"
+              className="transition-all duration-500 cursor-pointer"
+              style={{
+                transform: isOpen ? "rotate(180deg)" : "rotate(-180deg)",
+                width: "clamp(40px, 8vw, 54px)",
+                height: "clamp(40px, 8vw, 54px)"
+              }}
+            />
+          </div>
       </button>
 
                 <div

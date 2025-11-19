@@ -243,6 +243,12 @@ export function Header({ carrinho, removerDoCarrinho }: HeaderProps) {
               >
                 Contato
               </button>
+              <button
+                onClick={() => scrollToSection("faq")}
+                className="text-left text-lg text-gray-700 hover:text-rose-600 transition-colors"
+              >
+                FAQ
+              </button>
               <Button className="bg-gradient-to-r from-rose-400 to-rose-600 hover:from-rose-500 hover:to-rose-700 w-full">
                 Fazer Pedido
               </Button>
