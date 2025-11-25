@@ -8,8 +8,7 @@ const garfoFacaBlackIcon = "/Icons/garfo-faca-black.png";
 const galeriaBlackIcon = "/Icons/galeria-black.png";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
-
-
+import { useActivity } from "../context/ActivityContext";
 
 interface AdminHomeProps {
   pratos: number;
@@ -28,112 +27,101 @@ const AdminHome: React.FC<AdminHomeProps> = ({
   atividades,
   onNavigateTo,
 }) => {
-return (
-  <div className="navbar">
-    <div className="dashboard-content">
-      
-      <div className="welcome-card">
-        <h2>Bem-vinda, Simone!</h2>
-        <h1>Aqui você pode gerenciar seu cardápio e fotos de forma simples e rápida.</h1>
-      </div>
-    <section className="stats-container">
-      <div className="stats-card">
-        <div className="stats-card-header">
-          <img src={garfoFacaIcon} alt="" />
-          Pratos no Cardápio
-        </div>
-        <div className="stats-card-content">
-          <p>{pratos}</p>
-        </div>
-      </div>
-      
-      <div className="stats-card">
-        <div className="stats-card-header">
-          <img src={categoriaIcon} alt="" />
-          Categorias Criadas
-        </div>
-        <div className="stats-card-content">
-          <p>{categorias}</p>
-        </div>
-      </div>
-      
-      <div className="stats-card">
-        <div className="stats-card-header">
-          <img src={galeriaIcon} alt="" />
-          Fotos Adicionadas
-        </div>
-        <div className="stats-card-content">
-          <p>{fotos}</p>
-        </div>
-      </div>
-      
-      <div className="stats-card">
-        <div className="stats-card-header">
-          <img src={mensagemIcon} alt="" />
-          Mensagens Recebidas
-        </div>
-        <div className="stats-card-content">
-          <p>{eventos}</p>
-        </div>
-      </div>
-    </section>
+  const { activities } = useActivity();
 
-    {/* Seção de Atividades Recentes */}
-    <section className="activities-section">
-      <div className="activities-header">
-        Atividades Recentes
-      </div>
-      <div className="activities-list">
-        {atividades.map((atividade, index) => (
-          <div key={index} className="activity-item">
-            <div className="activity-bullet"></div>
-            <p className="activity-text">{atividade}</p>
+  return (
+    <div className="navbar">
+      <div className="dashboard-content">
+        <div className="welcome-card">
+          <h2>Bem-vinda, Simone!</h2>
+          <h1>Aqui você pode gerenciar seu cardápio e fotos de forma simples e rápida.</h1>
+        </div>
+
+        <section className="stats-container">
+          <div className="stats-card">
+            <div className="stats-card-header">
+              <img src={garfoFacaIcon} alt="" />
+              Pratos no Cardápio
+            </div>
+            <div className="stats-card-content">
+              <p>{pratos}</p>
+            </div>
           </div>
-        ))}
-      </div>
-    </section>
 
-    {/* Seção de Ações Rápidas */}
-    <section className="quick-actions">
-      <div className="actions-header">
-        Ações Rápidas
-      </div>
-      <div className="actions-grid">
-        <div 
-          className="action-button prato"
-          onClick={() => onNavigateTo("cardapio")}
-        >
-          <img src={garfoFacaBlackIcon} alt="" />
-          <span>Adicionar Novo Prato</span>
-        </div>
-        
-        <div 
-          className="action-button imagem"
-          onClick={() => onNavigateTo("fotos")}
-        >
-          <img src={galeriaBlackIcon} alt="" />
-          <span>Adicionar Nova Imagem</span>
-        </div>
-      </div>
-    </section>
+          <div className="stats-card">
+            <div className="stats-card-header">
+              <img src={categoriaIcon} alt="" />
+              Categorias Criadas
+            </div>
+            <div className="stats-card-content">
+              <p>{categorias}</p>
+            </div>
+          </div>
 
-  </div>
+          <div className="stats-card">
+            <div className="stats-card-header">
+              <img src={galeriaIcon} alt="" />
+              Fotos Adicionadas
+            </div>
+            <div className="stats-card-content">
+              <p>{fotos}</p>
+            </div>
+          </div>
+        </section>
 
-  <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-        />
-        
-  </div>
-  
-);
+        {/* Atividades Recentes */}
+        <section className="activities-section">
+          <div className="activities-header">Atividades Recentes</div>
+          <div className="activities-list">
+            {activities.length === 0 && (
+              <p className="empty-text">Nenhuma atividade recente.</p>
+            )}
+
+            {activities.map((atividade, index) => (
+              <div key={index} className="activity-item">
+                <div className="activity-bullet"></div>
+                <p className="activity-text">{atividade.message}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Ações Rápidas */}
+        <section className="quick-actions">
+          <div className="actions-header">Ações Rápidas</div>
+          <div className="actions-grid">
+            <div
+              className="action-button prato"
+              onClick={() => onNavigateTo("cardapio")}
+            >
+              <img src={garfoFacaBlackIcon} alt="" />
+              <span>Adicionar Novo Prato</span>
+            </div>
+
+            <div
+              className="action-button imagem"
+              onClick={() => onNavigateTo("fotos")}
+            >
+              <img src={galeriaBlackIcon} alt="" />
+              <span>Adicionar Nova Imagem</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
+    </div>
+  );
 };
 
 export default AdminHome;

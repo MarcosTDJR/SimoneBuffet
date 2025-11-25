@@ -57,15 +57,17 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 0 40px 40px 0;
   box-shadow: 0 4px 20px 0 rgba(255,2,2,0.25);
-  padding: 50px 60px 0px 60px;
+  padding: 30px 60px 40px 60px;
+  
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center; /* Centraliza verticalmente se sobrar espaço */
   align-items: center;
   box-sizing: border-box;
   z-index: 10;
-  overflow-y: auto; /* MUDANÇA: adiciona scroll */
-  overflow-x: hidden; /* MUDANÇA: evita scroll horizontal */
+  
+  /* MUDANÇA 3: Remove a rolagem */
+  overflow: hidden; 
 }
 
 .login-box::-webkit-scrollbar {
@@ -176,9 +178,10 @@
 }
 
 .login-box h1 {
-  font-size: 2.8rem; /* PADRÃO: mantém desktop */
+  font-size: 2.8rem;
   font-weight: 700;
-  margin-bottom: 5px;
+  margin-top: 0;      /* Garante que não tenha margem extra no topo */
+  margin-bottom: 25px; /* Espaço entre o título e o primeiro input */
   text-align: center;
   background: linear-gradient(135deg, #e91e63, #ad1457);
   -webkit-background-clip: text;
@@ -385,6 +388,51 @@
   width: 100%;
   margin-top: 53px;
   align-items: center;
+}
+
+.btn-voltar-site {
+  position: fixed;
+  top: 10px;
+  left: 20px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #e91e63;
+  border: none;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.btn-voltar-site:hover {
+  background: #e91e63;
+  color: white;
+  transform: translateX(-5px);
+  box-shadow: 0 6px 20px rgba(233, 30, 99, 0.3);
+}
+
+.btn-voltar-site svg {
+  transition: transform 0.3s ease;
+}
+
+.btn-voltar-site:hover svg {
+  transform: translateX(-3px);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .btn-voltar-site {
+    top: 10px;
+    left: 10px;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
 }
 
 .login-box .painel-login button.entrar {
@@ -618,7 +666,7 @@
   align-items: center;
   width: 100%;
   max-width: 640px;      /* igual ao da etapa 2 */
-  margin: 24px auto 0 auto; /* centraliza e dá espaço acima */
+  margin: 24px auto 50px auto; /* centraliza e dá espaço acima */
   gap: 16px;
   box-sizing: border-box;
   padding: 0;
@@ -644,14 +692,15 @@
 }
 
 .modal-content {
-  background: rgb(240, 234, 234);
+  background: rgb(238, 237, 237);
   backdrop-filter: blur(100px);
   -webkit-backdrop-filter: blur(100px);
   border: 2.5px solid rgba(247, 65, 65, 0.763);
   border-radius: 23px;
+  margin-bottom: -130px;
   padding: 100px;
-  max-width: 360px !important; 
-  max-height: 48vh;
+  max-width: 320px !important; 
+  max-height: 42.2vh;
   overflow-y: hidden !important; 
   overflow-x: hidden !important; 
   text-align: center;
@@ -704,6 +753,10 @@
 .btn-modal {
   background: linear-gradient(135deg, #e91e63, #ad1457) !important;
   color: white !important;
+  height: 36px;
+  width: 180px !important;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 .btn-modal:hover {
@@ -821,7 +874,7 @@
   align-items: center;
   justify-content: center;
   transition: transform 0.2s;
-  order: 1; /* CONFIRMA: fica à esquerda */
+  order: 1; 
 }
 
 .painel-nova-senha .btn-voltar-nova-senha {
@@ -838,7 +891,7 @@
   align-items: center;
   justify-content: center;
   transition: transform 0.2s;
-  order: 2; /* VOLTAR: fica à direita */
+  order: 2;
 }
 
 .painel-nova-senha .btn-enviar .entrar:hover,
@@ -870,9 +923,9 @@
 
 .modal-content .icone-erro-codigo {
   display: block;
-  margin: 0 auto 12px;
-  width: 162px;
-  height: 162px;
+  margin: -30px auto 6px;
+  width: 120px;
+  height: 120px;
   object-fit: contain;
 }
 
@@ -982,8 +1035,10 @@
 }
 
 .codigo-icon {
-  width: 140px;
-  height: 140px;
+  margin-bottom: -15px;
+  width: 120px;
+  height: 120px;
+  margin-top: -10px;
 }
 
 /* Container dos inputs de código */
@@ -1074,7 +1129,7 @@
   
   .login-box {
     position: absolute;
-    right: 5%;
+    right: 15%;
     top: 50%;
     transform: translateY(-50%);
     width: clamp(35vw, 38vw, 42vw); /* MUDANÇA: se adapta sozinho */
@@ -1161,11 +1216,6 @@
     width: auto;
     padding: clamp(32px, 4vw, 42px);
   }
-  
-  .modal-content .icone-erro-codigo {
-    width: clamp(150px, 17vw, 180px);
-    height: clamp(150px, 17vw, 180px);
-  }
 }
  
 /* Ícone - 1201px a 1400px */
@@ -1210,6 +1260,11 @@
   
   .login-box .painel-recuperacao input {
     padding-left: 45px;
+  }
+
+    .login-box h1 {
+    font-size: 2.4rem;
+    margin-bottom: 150px;
   }
 }
 
@@ -1336,8 +1391,8 @@
     justify-content: space-between;
     max-width: 100%;
     gap: 15px;
-    padding: 0 25px;
-    margin: 30px auto 0 auto;
+    padding: 0 35px;
+    margin: 30px auto 40px auto;
   }
   
   .login-box button.btn-voltar-codigo {
@@ -1429,13 +1484,6 @@
     margin-top: 80px;
   }
   
-  .painel-codigo .btn-enviar {
-    flex-direction: column;
-    gap: 20px;
-    padding: 0 30px;
-    margin: 35px auto 0 auto;
-  }
-  
   .login-box button.btn-voltar-codigo {
     width: calc(100% - 20px);
     max-width: 280px;
@@ -1445,7 +1493,7 @@
   }
   
   .modal-overlay {
-    padding: 20px;
+    padding: 60px;
   }
   
   .modal-content {
@@ -1484,7 +1532,7 @@
   .painel-codigo .btn-enviar {
     flex-direction: row;
     gap: 15px;
-    padding: 0 25px;
+    padding: 30px 35px;
     justify-content: space-between;
   }
   

@@ -9,8 +9,9 @@ import {
   updateDoc,
   deleteDoc,
 } from "firebase/firestore";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { initializeApp, getApp, getApps } from "firebase/app";
 
 import AdminHome from "./components/admin/Home/AdminHome";
 import Login from "./components/admin/Login/Login";
@@ -22,10 +23,11 @@ import {
 } from "./components/admin/Photos/AdminPhotos";
 import HeaderNav from "./components/admin/Header/HeaderNav";
 
-const homeIcon = "/Icons/home-black.png";
-const cardapioIcon = "/Icons/cardapio-black.png";
-const categoriaIcon = "/Icons/categoria-black.png";
-const galeriaIcon = "/Icons/galeria-black.png";
+const firebaseConfig = JSON.parse(
+  (typeof window !== 'undefined' && (window as any).__firebase_config) || '{}'
+);
+const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
 interface Prato {
   id: string;
@@ -42,39 +44,33 @@ interface Categoria {
 
 const Admin: React.FC = () => {
   const [logado, setLogado] = useState<boolean>(false);
-  const [pagina, setPagina] = useState<
-    "inicio" | "cardapio" | "fotos" | "categorias"
-  >("inicio");
+  const [pagina, setPagina] = useState<"inicio" | "cardapio" | "fotos">("inicio");
 
   const [pratos, setPratos] = useState<Prato[]>([]);
-  const [categoriasFirestore, setCategoriasFirestore] = useState<Categoria[]>(
-    []
-  );
+  const [categoriasFirestore, setCategoriasFirestore] = useState<Categoria[]>([]);
 
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
   const [eventos] = useState<number>(65);
-  const [atividades] = useState<string[]>([
-    "Novo Salgado Adicionado: Coxinha Recheada com Calabresa.",
-    'Imagem "Salão Principal" adicionada à sessão "Ambiente".',
-    'Valor do Doce "Bem-Casado" alterado para R$ 5,10.',
-    'A Bebida "Refrigerante 2L" foi excluída e não será mais exibida.',
-  ]);
+  const [atividades] = useState<string[]>([]);
 
-  const [novaCategoria, setNovaCategoria] = useState<{
-    nome: string;
-    descricao: string;
-  }>({
-    nome: "",
-    descricao: "",
-  });
-  const [editandoCategoriaId, setEditandoCategoriaId] = useState<string | null>(
-    null
-  );
-
-  // -------------------- FIRESTORE SNAPSHOTS --------------------
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setLogado(true);
+        localStorage.setItem("adminLogado", "true");
+      } else {
+        setLogado(false);
+        localStorage.removeItem("adminLogado");
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!logado) return;
+
     const unsub = onSnapshot(collection(db, "pratos"), (snapshot) => {
       const lista: Prato[] = snapshot.docs.map((d) => ({
         id: d.id,
@@ -83,9 +79,11 @@ const Admin: React.FC = () => {
       setPratos(lista);
     });
     return () => unsub();
-  }, []);
+  }, [logado]);
 
   useEffect(() => {
+    if (!logado) return;
+
     const unsub = onSnapshot(collection(db, "categorias"), (snapshot) => {
       const lista: Categoria[] = snapshot.docs.map((d) => ({
         id: d.id,
@@ -94,9 +92,8 @@ const Admin: React.FC = () => {
       setCategoriasFirestore(lista);
     });
     return () => unsub();
-  }, []);
+  }, [logado]);
 
-  // -------------------- LOCAL STORAGE --------------------
   useEffect(() => {
     const savedPhotos = localStorage.getItem("photos");
     if (savedPhotos) setPhotos(JSON.parse(savedPhotos));
@@ -107,44 +104,31 @@ const Admin: React.FC = () => {
   useEffect(() => {
     localStorage.setItem("photos", JSON.stringify(photos));
   }, [photos]);
+  
   useEffect(() => {
     localStorage.setItem("categories", JSON.stringify(categories));
   }, [categories]);
 
-  useEffect(() => {
-    const adminLogado = localStorage.getItem("adminLogado");
-    if (adminLogado === "true") setLogado(true);
-  }, []);
-
-  // -------------------- LOGIN --------------------
   const handleLogin = (usuario: string, senha: string) => {
-    if (usuario === "Admin" && senha === "12345678") {
-      setLogado(true);
-      localStorage.setItem("adminLogado", "true");
-      toast.success("✅ Login realizado com sucesso!");
-    } else {
-      toast.error("❌ Usuário ou senha incorretos!");
+    setLogado(true);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setLogado(false);
+      setPagina("inicio");
+    } catch (error) {
+      console.error("Erro ao sair", error);
     }
   };
 
-  const handleLogout = () => {
-    setLogado(false);
-    localStorage.removeItem("adminLogado");
-    toast.info("👋 Logout realizado com sucesso!");
-  };
-
-  // -------------------- PRATOS --------------------
-  const handleAddPrato = async (novoPrato: {
-    nome: string;
-    preco: number;
-    categoriaId: string;
-  }) => {
+  // HANDLERS PRATO
+  const handleAddPrato = async (novoPrato: { nome: string; preco: number; categoriaId: string }) => {
     try {
       await addDoc(collection(db, "pratos"), novoPrato);
-      toast.success("🍽️ Prato adicionado com sucesso!");
     } catch (error) {
       console.error("Erro ao adicionar prato:", error);
-      toast.error("❌ Erro ao adicionar prato!");
     }
   };
 
@@ -152,90 +136,47 @@ const Admin: React.FC = () => {
     if (window.confirm("Tem certeza que deseja excluir este prato?")) {
       try {
         await deleteDoc(doc(db, "pratos", id));
-        toast.success("❌ Prato excluído com sucesso!");
       } catch (error) {
         console.error("Erro ao excluir prato:", error);
-        toast.error("❌ Erro ao excluir prato!");
       }
     }
   };
 
-  const handleEditPrato = async (
-    id: string,
-    pratoAtualizado: { nome: string; preco: number; categoriaId: string }
-  ) => {
+  const handleEditPrato = async (id: string, pratoAtualizado: { nome: string; preco: number; categoriaId: string }) => {
     try {
       const pratoRef = doc(db, "pratos", id);
       await updateDoc(pratoRef, pratoAtualizado);
-      toast.success("✏️ Prato atualizado com sucesso!");
     } catch (error) {
       console.error("Erro ao editar prato:", error);
-      toast.error("❌ Erro ao editar prato!");
     }
   };
 
-  // -------------------- CATEGORIAS --------------------
-  const adicionarCategoria = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!novaCategoria.nome || !novaCategoria.descricao) {
-      toast.warning("⚠️ Preencha todos os campos!");
-      return;
-    }
+  // HANDLERS CATEGORIA
+  const handleAddCategoria = async (novaCategoria: { nome: string; descricao: string }) => {
     try {
-      await addDoc(collection(db, "categorias"), {
-        nome: novaCategoria.nome,
-        descricao: novaCategoria.descricao,
-      });
-      setNovaCategoria({ nome: "", descricao: "" });
-      toast.success("✅ Categoria criada com sucesso!");
+      await addDoc(collection(db, "categorias"), novaCategoria);
     } catch (error) {
-      console.error("Erro ao criar categoria:", error);
-      toast.error("❌ Erro ao criar categoria!");
+      console.error("Erro ao adicionar categoria:", error);
     }
   };
 
-  const salvarCategoriaEditada = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (
-      !novaCategoria.nome ||
-      !novaCategoria.descricao ||
-      !editandoCategoriaId
-    ) {
-      toast.warning("⚠️ Preencha todos os campos!");
-      return;
-    }
+  const handleEditCategoria = async (id: string, categoriaAtualizada: { nome: string; descricao: string }) => {
     try {
-      const categoriaRef = doc(db, "categorias", editandoCategoriaId);
-      await updateDoc(categoriaRef, {
-        nome: novaCategoria.nome,
-        descricao: novaCategoria.descricao,
-      });
-      setNovaCategoria({ nome: "", descricao: "" });
-      setEditandoCategoriaId(null);
-      toast.success("✅ Categoria editada com sucesso!");
+      const categoriaRef = doc(db, "categorias", id);
+      await updateDoc(categoriaRef, categoriaAtualizada);
     } catch (error) {
       console.error("Erro ao editar categoria:", error);
-      toast.error("❌ Erro ao editar categoria!");
     }
   };
 
-  const excluirCategoria = async (id: string) => {
-    if (window.confirm("Tem certeza que deseja excluir esta categoria?")) {
-      try {
-        await deleteDoc(doc(db, "categorias", id));
-        toast.success("❌ Categoria excluída com sucesso!");
-        if (editandoCategoriaId === id) {
-          setNovaCategoria({ nome: "", descricao: "" });
-          setEditandoCategoriaId(null);
-        }
-      } catch (error) {
-        console.error("Erro ao excluir categoria:", error);
-        toast.error("❌ Erro ao excluir categoria!");
-      }
+  const handleDeleteCategoria = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "categorias", id));
+    } catch (error) {
+      console.error("Erro ao excluir categoria:", error);
     }
   };
 
-  // -------------------- RENDER --------------------
   if (!logado) {
     return <Login onLogin={handleLogin} />;
   }
@@ -249,7 +190,6 @@ const Admin: React.FC = () => {
         setPagina={setPagina}
       />
 
-      {/* Renderização condicional */}
       {pagina === "inicio" && (
         <AdminHome
           pratos={pratos.length}
@@ -260,6 +200,7 @@ const Admin: React.FC = () => {
           onNavigateTo={(p) => setPagina(p)}
         />
       )}
+      
       {pagina === "cardapio" && (
         <AdminMenu
           pratos={pratos}
@@ -267,8 +208,12 @@ const Admin: React.FC = () => {
           onAddPrato={handleAddPrato}
           onDeletePrato={handleDeletePrato}
           onEditPrato={handleEditPrato}
+          onAddCategoria={handleAddCategoria}
+          onEditCategoria={handleEditCategoria}
+          onDeleteCategoria={handleDeleteCategoria}
         />
       )}
+      
       {pagina === "fotos" && (
         <AdminPhotos
           photos={photos}
@@ -277,69 +222,6 @@ const Admin: React.FC = () => {
           setCategories={setCategories}
         />
       )}
-      {pagina === "categorias" && (
-        <div className="categories-container">
-          <h2>Categorias</h2>
-          <form
-            onSubmit={
-              editandoCategoriaId ? salvarCategoriaEditada : adicionarCategoria
-            }
-            className="category-form"
-          >
-            <input
-              type="text"
-              placeholder="Nome da categoria"
-              value={novaCategoria.nome}
-              onChange={(e) =>
-                setNovaCategoria({ ...novaCategoria, nome: e.target.value })
-              }
-            />
-            <input
-              type="text"
-              placeholder="Descrição"
-              value={novaCategoria.descricao}
-              onChange={(e) =>
-                setNovaCategoria({
-                  ...novaCategoria,
-                  descricao: e.target.value,
-                })
-              }
-            />
-            <button type="submit">
-              {editandoCategoriaId ? "Salvar Alteração" : "Salvar Categoria"}
-            </button>
-          </form>
-          <ul>
-            {categoriasFirestore.map((c) => (
-              <li key={c.id}>
-                📌 {c.nome} - {c.descricao}
-                <button
-                  onClick={() => {
-                    setNovaCategoria({ nome: c.nome, descricao: c.descricao });
-                    setEditandoCategoriaId(c.id);
-                  }}
-                >
-                  Editar
-                </button>
-                <button onClick={() => excluirCategoria(c.id)}>Excluir</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="colored"
-      />
     </div>
   );
 };

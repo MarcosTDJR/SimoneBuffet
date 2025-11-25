@@ -1,178 +1,498 @@
-.menu-container {
-    padding: 140px 20px 20px;
+/* === REUTILIZANDO CLASSES DA HOME (PARA MANTER PADRÃO) === */
+/* Estas classes garantem que o fundo e o container sejam idênticos ao AdminHome */
+
+.navbar {
     background-color: #fef7f7;
+    padding: 160px 20px 40px;
     min-height: 100vh;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 
-.menu-container h2 {
-  color: #2d3748;
-  margin-bottom: 30px;
-  font-size: 28px;
+.dashboard-content {
+    width: 100%;
+    max-width: 1200px;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f0f0;
+    overflow: hidden;
+    padding: 0;
+}
+
+/* Cabeçalho estilo Home (Welcome Card) */
+.welcome-card {
+    background: linear-gradient(135deg, #e91e63, #ad1457);
+    color: white;
+    padding: 32px;
+    margin: 0;
+    border-radius: 0;
+}
+
+.welcome-card h2 {
+    margin: 0 0 8px 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.welcome-card h1 {
+    margin: 0;
+    font-size: 0.95rem;
+    opacity: 0.9;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.menu-header-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* Botões brancos translúcidos no cabeçalho rosa */
+.header-actions-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.action-btn-white {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(5px);
+    transition: all 0.2s;
+}
+
+.action-btn-white:hover {
+    background: white;
+    color: #ad1457;
+}
+
+/* === CONTEÚDO DO MENU === */
+.menu-content-pad {
+    padding: 32px;
+    background: white;
+}
+
+/* Bloco de Categoria (Cardapio) */
+.category-block {
+    margin-bottom: 32px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+/* Barra Rosa do Título da Categoria */
+.category-header-gradient {
+    background: linear-gradient(135deg, #e91e63, #ad1457);
+    color: white;
+    padding: 16px 24px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.category-items-list {
+    padding: 5px 0;
+    background: #fff;
+}
+
+/* Linha do Prato */
+.prato-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid #f5f5f5;
+    transition: background 0.2s;
+}
+
+.prato-item-row:last-child {
+    border-bottom: none;
+}
+
+.prato-item-row:hover {
+    background-color: #fff0f6; /* Hover rosa bem clarinho */
+}
+
+.prato-info-col {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.prato-name-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.prato-price-text {
+    font-size: 0.95rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.prato-actions-col {
+    display: flex;
+    gap: 10px;
+}
+
+/* Botões de Ação (Editar/Excluir) */
+.btn-icon-edit, .btn-icon-delete {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: white;
+    transition: 0.2s;
+}
+
+.btn-icon-edit {
+    border: 1px solid #3b82f6;
+    color: #3b82f6;
+}
+.btn-icon-edit:hover { background: #eff6ff; }
+
+.btn-icon-delete {
+    border: 1px solid #ef4444;
+    color: #ef4444;
+}
+.btn-icon-delete:hover { background: #fef2f2; }
+
+.empty-cat {
+    text-align: center;
+    padding: 30px;
+    color: #999;
+    font-style: italic;
+}
+
+/* === MODAIS === */
+.modal-overlay-custom {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px);
+}
+
+.modal-box {
+    background: white;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    overflow: hidden;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-top {
+    background: #f9fafb;
+    padding: 20px 24px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-top h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.2rem;
+}
+
+.close-modal {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #999;
+    padding: 0;
+}
+.close-modal:hover { color: #333; }
+
+.modal-form {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modal-form label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #444;
+    margin-bottom: -8px;
+}
+
+.modal-form input, .modal-form select {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+    outline: none;
+    background: #fff;
+}
+
+.modal-form input:focus, .modal-form select:focus {
+    border-color: #e91e63;
+    box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.1);
+}
+
+.modal-btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.btn-c {
+    background: #f3f4f6;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+}
+
+.btn-s {
+    background: linear-gradient(135deg, #e91e63, #ad1457);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+.btn-s:hover { transform: scale(1.02); }
+
+/* ... existing code ... */
+
+/* MODAL GERENCIAR CATEGORIAS */
+.modal-large {
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.category-list-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.category-list-section h4 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 1rem;
   font-weight: 600;
 }
 
-.form-container {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
+.category-list {
   display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-  border: 1px solid #e2e8f0;
-}
-
-.form-container input,
-.form-container select {
-  flex: 1;
-  min-width: 200px;
-  padding: 12px 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-container input:focus,
-.form-container select:focus {
-  outline: none;
-  border-color: #e91e63;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
-}
-
-.form-container button {
-  background: #e91e63;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s, transform 0.2s;
-  min-width: 150px;
-}
-
-.form-container button:hover {
-  background: #e91e63;
-  transform: translateY(-1px);
-}
-
-.pratos-list {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-  border: 1px solid #e2e8f0;
-}
-
-.pratos-list h3 {
-  color: #2d3748;
-  margin-bottom: 20px;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.pratos-list ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.prato-item {
-  padding: 12px 0;
-  border-bottom: 1px solid #f7fafc;
-  color: #4a5568;
-  font-size: 16px;
-}
-
-.prato-item:last-child {
-  border-bottom: none;
-}
-
-.categoria-badge {
-  background: #bee3f8;
-  color: #2b6cb0;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-  margin-left: 10px;
-}
-
-.empty-message {
-  text-align: center;
-  color: #a0aec0;
-  font-style: italic;
-  padding: 40px 20px;
-}
-
-.future-features {
-  background: #f7fafc;
-  padding: 25px;
-  border-radius: 12px;
-  border: 2px dashed #cbd5e0;
-}
-
-.future-features h3 {
-  color: #2d3748;
-  margin-bottom: 20px;
-  font-size: 18px;
-}
-
-.feature-buttons {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  flex-direction: column;
   gap: 12px;
-  margin-bottom: 20px;
 }
 
-.feature-btn {
-  background: #edf2f7;
-  color: #718096;
-  border: 1px solid #e2e8f0;
+.category-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 12px 16px;
+  background: #f8f9fa;
   border-radius: 8px;
-  cursor: not-allowed;
-  font-size: 14px;
+  border: 1px solid #e0e0e0;
+}
+
+.category-list-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.category-list-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.category-list-desc {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.category-list-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ...existing code... */
+
+/* MODAL GERENCIAR CATEGORIAS */
+.modal-large {
+  max-width: 550px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-large .modal-form {
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-large .modal-btns {
+  justify-content: flex-end;
+}
+
+.category-list-section {
+  padding: 20px 24px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.category-list-section h4 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.category-list-section h4::before {
+  content: "";
+  width: 4px;
+  height: 18px;
+  background: linear-gradient(135deg, #e91e63, #ad1457);
+  border-radius: 2px;
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.category-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: #fafafa;
+  border-radius: 12px;
+  border: 1px solid #eee;
   transition: all 0.2s;
 }
 
-.feature-btn:hover {
-  background: #e2e8f0;
+.category-list-item:hover {
+  background: #fff0f6;
+  border-color: #fce4ec;
 }
 
-.dev-note {
-  background: #fef5e7;
-  border: 1px solid #f6e05e;
-  padding: 15px;
-  border-radius: 8px;
-  color: #744210;
-  font-size: 14px;
-  line-height: 1.5;
+.category-list-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
 }
 
-.dev-note code {
-  background: #fed7aa;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: 'Monaco', 'Courier New', monospace;
-  font-size: 12px;
+.category-list-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
 }
 
+.category-list-desc {
+  color: #888;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.category-list-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.category-list-actions .btn-icon-edit,
+.category-list-actions .btn-icon-delete {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
+/* Scrollbar personalizada para lista de categorias */
+.category-list-section::-webkit-scrollbar {
+  width: 6px;
+}
+
+.category-list-section::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.category-list-section::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.category-list-section::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
+
+/* Estado vazio melhorado */
+.category-list-section .empty-cat {
+  background: #f9f9f9;
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  color: #999;
+  font-style: normal;
+  font-size: 0.9rem;
+}
+
+/* ...existing code... */
+
+/* Responsividade */
 @media (max-width: 768px) {
-  .form-container {
-    flex-direction: column;
-  }
-  
-  .form-container input,
-  .form-container select {
-    min-width: 100%;
-  }
-  
-  .feature-buttons {
-    grid-template-columns: 1fr;
-  }
+    .navbar { padding: 100px 16px 30px; }
+    .welcome-card { padding: 24px; }
+    .header-actions-buttons { width: 100%; margin-top: 10px; }
+    .action-btn-white { flex: 1; justify-content: center; }
+    .prato-item-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .prato-actions-col { width: 100%; display: flex; justify-content: space-between; }
+    .btn-icon-edit, .btn-icon-delete { flex: 1; justify-content: center; }
 }

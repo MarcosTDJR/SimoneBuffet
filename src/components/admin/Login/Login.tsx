@@ -1,7 +1,15 @@
-// src/components/Login/Login.tsx
+// src/components/admin/Login/Login.tsx
 import React, { useState } from "react";
 import "./Login.css";
 
+// --- IMPORTAÇÕES DO FIREBASE ---
+import { initializeApp, getApp, getApps } from "firebase/app";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+
+// --- IMPORTAÇÃO DO SERVIÇO ---
+import { authService } from "../../../services/authService";
+
+// --- SUAS IMAGENS ORIGINAIS ---
 import boloWhite from "/Icons/bolo-white.png";
 import boloColor from "/Icons/bolo-color.gif";
 import fundo from "/Icons/rectangle 19.png";
@@ -20,6 +28,14 @@ import codigoIcon from "/Icons/codigoIcon.png";
 import iconeErroCodigo from "/Icons/iconeErroCodigo.png";
 import fundoCinzaDireita from "/Icons/fundoCinzaDireita.png";
 
+import { useNavigate } from "react-router-dom";
+
+const firebaseConfig = JSON.parse(
+  (typeof window !== 'undefined' && (window as any).__firebase_config) || '{}'
+);
+
+const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
 interface LoginProps {
   onLogin: (usuario: string, senha: string) => void;
@@ -46,6 +62,9 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
   const [mostrarModal, setMostrarModal] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [mostrarToast, setMostrarToast] = useState(false);
+  
+  // Estado de carregamento para feedback visual
+  const [loading, setLoading] = useState(false);
 
   React.useEffect(() => {
     if (modoRecuperacao && etapaRecuperacao === 2 && tempoRestante > 0) {
@@ -104,25 +123,30 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
     }, duration);
   };
 
-  const verificarCodigo = () => {
+  // --- VERIFICAÇÃO DE CÓDIGO ---
+  const verificarCodigo = async () => {
     const codigoCompleto = codigo.join("");
     if (codigoCompleto.length !== 4) {
       showToast("Digite os 4 dígitos do código.");
       return;
     }
 
-    const codigoCorreto = "1234"; // simulação
+    setLoading(true);
+    // Chama o serviço para validar no Firebase
+    const isValid = await authService.validarCodigo(email, codigoCompleto);
+    setLoading(false);
 
-    if (codigoCompleto === codigoCorreto) {
+    if (isValid) {
       setEtapaRecuperacao(3);
       showToast("Código verificado. Você pode criar uma nova senha.");
     } else {
-      showToast("Código incorreto. Verifique e tente novamente.");
+      showToast("Código incorreto ou expirado.");
       setMostrarModal(true);
     }
   };
 
-  const confirmarNovaSenha = () => {
+  // --- CONFIRMAR SENHA ---
+  const confirmarNovaSenha = async () => {
     if (!novaSenha || !confirmarSenha) {
       showToast("Preencha os campos de senha.");
       return;
@@ -133,9 +157,16 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
       return;
     }
 
-    console.log("Senha alterada com sucesso (simulação).");
+    setLoading(true);
+    // Invalida o código no banco
+    await authService.invalidarCodigo(email);
+    setLoading(false);
+
+    // AQUI: Simulação de troca de senha (já que não temos backend Node)
+    console.log("Senha alterada com sucesso (Simulação Backend).");
     showToast("Senha alterada com sucesso!");
-    // reset do modo de recuperação
+    
+    // Reset do fluxo
     setModoRecuperacao(false);
     setEtapaRecuperacao(1);
     setEmail("");
@@ -145,21 +176,33 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
     setTempoRestante(600);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    // Se estiver em modo recuperação, segue o fluxo de recuperação normalmente.
+    // Se estiver em modo recuperação, segue o fluxo de recuperação.
     if (modoRecuperacao) {
       if (etapaRecuperacao === 1) {
+        // --- ENVIO DE EMAIL ---
         if (!email || email.trim() === "" || !email.includes("@")) {
           showToast("Insira um email válido.");
           return;
         }
-        console.log("Enviando email para:", email);
-        setEtapaRecuperacao(2);
-        setTempoRestante(600);
-        showToast("Código enviado (simulação).");
+        
+        setLoading(true);
+        // Chama o serviço do EmailJS
+        const enviado = await authService.enviarCodigoRecuperacao(email);
+        setLoading(false);
+
+        if (enviado) {
+          console.log("Enviando email para:", email);
+          setEtapaRecuperacao(2);
+          setTempoRestante(600);
+          showToast("Código enviado para seu e-mail.");
+        } else {
+          showToast("Erro ao enviar e-mail. Tente novamente.");
+        }
+
       } else if (etapaRecuperacao === 2) {
         verificarCodigo();
       } else if (etapaRecuperacao === 3) {
@@ -169,8 +212,6 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
     }
 
     // ---------- MODO LOGIN NORMAL ----------
-    // Importante: quando NÃO estivermos em modoRecuperacao, o form tem noValidate
-    // e TODOS os inputs de recuperação estão disabled (logo o browser não bloqueia).
     const usuario = credenciais.usuario.trim();
     const senha = credenciais.senha.trim();
 
@@ -179,10 +220,15 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
       return;
     }
 
-    // chama onLogin (Admin.tsx faz a verificação final)
+    setLoading(true);
     try {
+      // Login Real com Firebase Auth
+      await signInWithEmailAndPassword(auth, usuario, senha);
+      
+      // Chama a prop do pai (Admin.tsx) para redirecionar
       onLogin(usuario, senha);
-      // por segurança, reseta qualquer coisa de recuperação (caso esteja "oculto" mas com estado)
+      
+      // Reset de segurança
       setModoRecuperacao(false);
       setEtapaRecuperacao(1);
       setEmail("");
@@ -191,17 +237,21 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
       setConfirmarSenha("");
       setTempoRestante(600);
 
-      // opcional: toast de sucesso (Admin pode redirecionar)
-      showToast("Tentando entrar...");
-    } catch (error) {
-      console.error("Erro no onLogin:", error);
-      showToast("Erro no login.");
+      showToast("Entrando...");
+    } catch (error: any) {
+      console.error("Erro no Login:", error);
+      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        showToast("E-mail ou senha incorretos.");
+      } else {
+        showToast("Erro no login.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   const toggleRecuperacao = (e?: React.MouseEvent) => {
     if (e) e.preventDefault();
-    // alterna pra modo recuperação e zera pra etapa 1
     setModoRecuperacao((prev) => !prev);
     setEtapaRecuperacao(1);
     setEmail("");
@@ -211,9 +261,6 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
     setTempoRestante(600);
   };
 
-  // ---------- AQUI: quando NÃO estamos em modoRecuperacao,
-  // desativamos a validação nativa do form (noValidate) e
-  // deixamos os inputs de recuperação com disabled=true para o navegador ignorar. ----------
   return (
     <div className="login-box">
       <h1>
@@ -227,12 +274,12 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
           onClick={() => setMostrarModal(false)}
           style={{
             position: "fixed",
-            inset: 0,
+            inset: -100,
             background: "rgba(0,0,0,0.45)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            zIndex: 9999,
+            zIndex: 99,
           }}
         >
           <div
@@ -281,7 +328,7 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
         </div>
       )}
 
-      {/* noValidate = true quando não estamos em modoRecuperacao (desativa validação nativa) */}
+      {/* noValidate = true quando não estamos em modoRecuperacao */}
       <form onSubmit={handleSubmit} autoComplete="on" noValidate={!modoRecuperacao}>
         <div
           className={`formulario-wrapper ${modoRecuperacao ? "modo-recuperacao" : ""} ${etapaRecuperacao === 2 ? "etapa-2" : ""} ${etapaRecuperacao === 3 ? "etapa-3" : ""}`}
@@ -299,7 +346,6 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
                 onChange={(e) => setCredenciais({ ...credenciais, usuario: e.target.value })}
                 placeholder="Digite seu usuário"
                 autoComplete="username"
-                // não required: tratamos em JS
               />
             </div>
 
@@ -354,9 +400,14 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
                 className="entrar"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
+                disabled={loading}
               >
-                <img className="icon-bolo" src={isHovering ? boloColor : boloWhite} alt="" />
-                Entrar
+                {loading ? "Carregando..." : (
+                  <>
+                    <img className="icon-bolo" src={isHovering ? boloColor : boloWhite} alt="" />
+                    Entrar
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -383,17 +434,10 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
               <button
                 type="button"
                 className="btn-enviar-codigo"
-                onClick={() => {
-                  if (!email || !email.includes("@")) {
-                    showToast("Insira um email válido.");
-                    return;
-                  }
-                  setEtapaRecuperacao(2);
-                  setTempoRestante(600);
-                }}
-                disabled={!modoRecuperacao || etapaRecuperacao !== 1}
+                onClick={handleSubmit} 
+                disabled={(!modoRecuperacao || etapaRecuperacao !== 1) || loading}
               >
-                Enviar Código
+                {loading ? "Enviando..." : "Enviar Código"}
               </button>
               <button
                 type="button"
@@ -441,8 +485,13 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
             </div>
 
             <div className="btn-enviar">
-              <button type="button" className="entrar" onClick={verificarCodigo} disabled={!modoRecuperacao || etapaRecuperacao !== 2}>
-                Verificar Código
+              <button 
+                type="button" 
+                className="entrar" 
+                onClick={verificarCodigo} 
+                disabled={(!modoRecuperacao || etapaRecuperacao !== 2) || loading}
+              >
+                {loading ? "Verificando..." : "Verificar Código"}
               </button>
               <button type="button" className="btn-voltar-codigo" onClick={toggleRecuperacao}>
                 Voltar
@@ -508,9 +557,9 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
                 type="button"
                 className="entrar"
                 onClick={confirmarNovaSenha}
-                disabled={!modoRecuperacao || etapaRecuperacao !== 3}
+                disabled={(!modoRecuperacao || etapaRecuperacao !== 3) || loading}
               >
-                Confirmar
+                {loading ? "Confirmando..." : "Confirmar"}
               </button>
             </div>
           </div>
@@ -520,29 +569,46 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
   );
 };
 
-const Login: React.FC<LoginProps> = ({ onLogin }) => (
-  <div className="login-container" style={{ backgroundImage: `url(${fundo})` }}>
-    <img src={frutas} alt="Frutas" />
-    <img src={frutasbaixo} alt="Frutas Baixo" />
-    <img src={animacaoSalada} alt="Animação Salada" className="animacao-salada" />
-    <img src={fruitSaladPana} alt="Fruit Salad Pana" className="fruit-salad-pana" />
-    <img src={healthyFoodBro} alt="Healthy Food Bro" className="healthy-food-bro" />
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
+  const navigate = useNavigate();
 
-    <div className="left-side-container">
-      <img src={loginOriginal} alt="Login Original" className="login-original-img" />
+  return (
+    <div className="login-container" style={{ backgroundImage: `url(${fundo})` }}>
+      
+      {/* Botao Voltar para o Site */}
+      <button 
+        className="btn-voltar-site"
+        onClick={() => navigate("/")}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m12 19-7-7 7-7"/>
+          <path d="M19 12H5"/>
+        </svg>
+        Pagina Inicial
+      </button>
+
+      <img src={frutas} alt="Frutas" />
+      <img src={frutasbaixo} alt="Frutas Baixo" />
+      <img src={animacaoSalada} alt="Animacao Salada" className="animacao-salada" />
+      <img src={fruitSaladPana} alt="Fruit Salad Pana" className="fruit-salad-pana" />
+      <img src={healthyFoodBro} alt="Healthy Food Bro" className="healthy-food-bro" />
+
+      <div className="left-side-container">
+        <img src={loginOriginal} alt="Login Original" className="login-original-img" />
+      </div>
+
+      <div className="titulo-camadas">
+        <div className="buffet-principal">Buffet</div>
+        <div className="s-grande-destaque">S</div>
+        <div className="imone-texto">imone</div>
+      </div>
+
+      <div className="quadrado-imagem"></div>
+
+      <LoginBox onLogin={onLogin} />
+      <div className="login-box-outline"></div>
     </div>
-
-    <div className="titulo-camadas">
-      <div className="buffet-principal">Buffet</div>
-      <div className="s-grande-destaque">S</div>
-      <div className="imone-texto">imone</div>
-    </div>
-
-    <div className="quadrado-imagem"></div>
-
-    <LoginBox onLogin={onLogin} />
-    <div className="login-box-outline"></div>
-  </div>
-);
+  );
+};
 
 export default Login;

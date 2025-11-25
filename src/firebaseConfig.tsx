@@ -3,12 +3,12 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAnzDc4jWWxVr5pDuGjmEGdiuHSy7dH5ic",
-    authDomain: "projeto-simone.firebaseapp.com",
-    projectId: "projeto-simone",
-    storageBucket: "projeto-simone.firebasestorage.app",
-    messagingSenderId: "414153938328",
-    appId: "1:414153938328:web:e71a6a05180f16cd4e47ed",
+  apiKey: "AIzaSyB6KjLDPZUaeMLs08z0Bm8-Cu-v_lC-9M8",
+  authDomain: "simone-buffet.firebaseapp.com",
+  projectId: "simone-buffet",
+  storageBucket: "simone-buffet.firebasestorage.app",
+  messagingSenderId: "664173332248",
+  appId: "1:664173332248:web:a5999556ddab0373a9006d"
 };
 
 // Inicializa o Firebase

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./HeaderModules.css";
-import { Home, UtensilsCrossed, FolderOpen, Image, LogOut, Menu, X } from "lucide-react";
+import { Home, UtensilsCrossed, Image, LogOut, Menu, X } from "lucide-react";
 
 interface HeaderNavProps {
   onLogout?: () => void;
@@ -9,25 +9,16 @@ interface HeaderNavProps {
   setPagina: (page: string) => void;
 }
 
-
 const HeaderNav: React.FC<HeaderNavProps> = ({ onLogout, userName = "Simone", pagina, setPagina }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
-
-  const handleLogout = () => {
-    if (window.confirm("Deseja realmente sair?")) {
-      onLogout?.();
-    }
-  };
-
   const handleNavClick = (page: string) => {
     setPagina(page);
-    setMenuOpen(false); // Fecha o menu ao clicar em mobile
+    setMenuOpen(false);
   };
 
   return (
     <>
-      {/* HEADER */}
       <header className="header-top">
         <div className="header-brand">
           <div className="icon-container">
@@ -49,40 +40,30 @@ const HeaderNav: React.FC<HeaderNavProps> = ({ onLogout, userName = "Simone", pa
         </div>
       </header>
 
-      {/* NAVBAR */}
       <header className="main-navbar">
         <div className="nav-container">
-          {/* Botão Hambúrguer */}
           <button 
             className={`hamburger-menu ${menuOpen ? 'active' : ''}`}
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Menu de navegação"
+            aria-label="Menu de navegacao"
           >
             {menuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
 
-          {/* Navegação */}
           <nav className={menuOpen ? 'nav-open' : ''}>
             <button 
               className={pagina === "inicio" ? "nav-active" : ""} 
               onClick={() => handleNavClick("inicio")}
             >
               <Home size={20} />
-              <span>Início</span>
+              <span>Inicio</span>
             </button>
             <button 
               className={pagina === "cardapio" ? "nav-active" : ""} 
               onClick={() => handleNavClick("cardapio")}
             >
               <UtensilsCrossed size={20} />
-              <span>Cardápio</span>
-            </button>
-            <button 
-              className={pagina === "categorias" ? "nav-active" : ""} 
-              onClick={() => handleNavClick("categorias")}
-            >
-              <FolderOpen size={20} />
-              <span>Categorias</span>
+              <span>Cardapio</span>
             </button>
             <button 
               className={pagina === "fotos" ? "nav-active" : ""} 
@@ -94,7 +75,7 @@ const HeaderNav: React.FC<HeaderNavProps> = ({ onLogout, userName = "Simone", pa
           </nav>
         </div>
         {onLogout && (
-          <button onClick={handleLogout} className="logout-button">
+          <button onClick={onLogout} className="logout-button">
             <LogOut size={18} />
             <span>Sair</span>
           </button>

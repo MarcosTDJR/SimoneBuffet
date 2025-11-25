@@ -40,7 +40,7 @@ export function MenuSection({ adicionarAoCarrinho }: MenuSectionProps) {
         return {
           id: doc.id,
           name: data.nome,
-          description: "Prato adicionado pelo administrador 🍴",
+          description: "",
           price: `R$ ${data.preco.toFixed(2)}`,
           categoriaId: data.categoriaId || "sem-categoria",
         };
@@ -157,12 +157,6 @@ export function MenuSection({ adicionarAoCarrinho }: MenuSectionProps) {
                       <p className="text-gray-600 text-sm mb-4 leading-relaxed">{item.description}</p>
                       <div className="flex justify-between items-center">
                         <span className="text-rose-600 font-bold text-lg">{item.price}</span>
-                        <button
-                          onClick={() => adicionarAoCarrinho(item)}
-                          className="bg-rose-50 text-rose-600 px-4 py-2 rounded-lg hover:bg-rose-100 transition-colors text-sm font-medium"
-                        >
-                          Adicionar
-                        </button>
                       </div>
                     </CardContent>
                   </Card>
