@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./PhotoModules.css";
-import { Edit2, Trash2, Plus, X, Image, FolderPlus } from "lucide-react";
+import { Trash2, Plus, X, Image, FolderPlus } from "lucide-react";
 import {
   UtensilsCrossed,
   Cake,
@@ -11,15 +11,21 @@ import {
 } from "lucide-react";
 import { useActivity } from "../context/ActivityContext";
 
+// Imports do Firebase
+import { db } from "../../../firebaseConfig"; // Ajuste o caminho conforme necessário
+import { collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "firebase/firestore";
+import { uploadImageToStorage } from "../../../services/uploadService";
+
 export interface Photo {
   id: string;
   name: string;
   description: string;
   category: string;
-  image: string;
+  image: string; // Agora isso será uma URL do Firebase Storage
 }
 
 export interface Category {
+  id?: string; // ID do Firestore
   label: string;
   iconLabel: string;
 }
@@ -56,6 +62,7 @@ export function AdminPhotos({
   const [showAddPhotoModal, setShowAddPhotoModal] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [isUploading, setIsUploading] = useState(false); // Novo estado de loading
 
   const [newPhoto, setNewPhoto] = useState<{
     name: string;
@@ -74,85 +81,136 @@ export function AdminPhotos({
   const [newCategoryLabel, setNewCategoryLabel] = useState("");
   const [selectedIconLabel, setSelectedIconLabel] = useState<string | null>(null);
 
+  // --- FIREBASE: Carregar Fotos em Tempo Real ---
   useEffect(() => {
-    const savedPhotos = localStorage.getItem("photos");
-    if (savedPhotos) setPhotos(JSON.parse(savedPhotos));
+    const q = query(collection(db, "photos"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const photosData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Photo[];
+      setPhotos(photosData);
+    });
+    return () => unsubscribe();
+  }, [setPhotos]);
 
-    const savedCategories = localStorage.getItem("categories");
-    if (savedCategories) setCategories(JSON.parse(savedCategories));
-  }, []);
-
+  // --- FIREBASE: Carregar Categorias em Tempo Real ---
   useEffect(() => {
-    localStorage.setItem("photos", JSON.stringify(photos));
-  }, [photos]);
+    const q = query(collection(db, "photo_categories")); // Coleção separada para categorias
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const catsData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Category[];
+      setCategories(catsData);
+    });
+    return () => unsubscribe();
+  }, [setCategories]);
 
-  useEffect(() => {
-    localStorage.setItem("categories", JSON.stringify(categories));
-  }, [categories]);
-
+  // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewPhoto({ ...newPhoto, file, preview: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      // Preview local (rápido) para o usuário ver o que selecionou
+      const objectUrl = URL.createObjectURL(file);
+      setNewPhoto({ ...newPhoto, file, preview: objectUrl });
     }
   };
 
-  const handleAddPhoto = () => {
+  // --- FIREBASE: Salvar Foto ---
+  const handleAddPhoto = async () => {
     if (!newPhoto.file || !newPhoto.name || !newPhoto.category) {
       alert("Preencha todos os campos e selecione uma imagem e categoria!");
       return;
     }
 
-    const newItem: Photo = {
-      id: Date.now().toString(),
-      name: newPhoto.name,
-      description: newPhoto.description,
-      category: newPhoto.category,
-      image: newPhoto.preview!,
-    };
+    setIsUploading(true);
 
-    setPhotos((prev) => [...prev, newItem]);
-    addActivity(`Nova foto adicionada: "${newPhoto.name}".`);
-    setNewPhoto({ name: "", description: "", category: "", file: null, preview: null });
-    setShowAddPhotoModal(false);
-  };
+    try {
+      // 1. Upload da imagem para o Storage
+      const imageUrl = await uploadImageToStorage(newPhoto.file, "gallery");
 
-  const handleDelete = (id: string, name: string) => {
-    if (confirm("Tem certeza que deseja excluir esta foto?")) {
-      setPhotos((prev) => prev.filter((photo) => photo.id !== id));
-      addActivity(`Foto "${name}" foi excluida.`);
+      // 2. Salvar dados no Firestore
+      await addDoc(collection(db, "photos"), {
+        name: newPhoto.name,
+        description: newPhoto.description,
+        category: newPhoto.category,
+        image: imageUrl, // URL pública do Firebase
+        createdAt: new Date().toISOString()
+      });
+
+      addActivity(`Nova foto adicionada: "${newPhoto.name}".`);
+      
+      // Limpar form
+      setNewPhoto({ name: "", description: "", category: "", file: null, preview: null });
+      setShowAddPhotoModal(false);
+
+    } catch (error) {
+      console.error("Erro ao salvar foto:", error);
+      alert("Erro ao salvar a foto. Tente novamente.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
-  const handleAddCategory = () => {
+  // --- FIREBASE: Deletar Foto ---
+  const handleDelete = async (id: string, name: string) => {
+    if (confirm("Tem certeza que deseja excluir esta foto?")) {
+      try {
+        await deleteDoc(doc(db, "photos", id));
+        // Nota: Idealmente deletaríamos a imagem do Storage também, mas requer lógica extra.
+        // Por enquanto deletamos a referência no banco.
+        addActivity(`Foto "${name}" foi excluída.`);
+      } catch (error) {
+        console.error("Erro ao deletar:", error);
+        alert("Erro ao excluir foto.");
+      }
+    }
+  };
+
+  // --- FIREBASE: Salvar Categoria ---
+  const handleAddCategory = async () => {
     const label = newCategoryLabel.trim();
     if (!label) {
       alert("Digite o nome da categoria.");
       return;
     }
     if (!selectedIconLabel) {
-      alert("Selecione um icone para a categoria.");
+      alert("Selecione um ícone para a categoria.");
       return;
     }
+    // Verifica duplicidade localmente
     if (categories.find((c) => c.label.toLowerCase() === label.toLowerCase())) {
-      alert("Categoria ja existe.");
+      alert("Categoria já existe.");
       return;
     }
 
-    setCategories((prev) => [...prev, { label, iconLabel: selectedIconLabel }]);
-    addActivity(`Nova categoria de fotos adicionada: "${label}".`);
-    setNewCategoryLabel("");
-    setSelectedIconLabel(null);
+    try {
+      await addDoc(collection(db, "photo_categories"), {
+        label,
+        iconLabel: selectedIconLabel
+      });
+      
+      addActivity(`Nova categoria adicionada: "${label}".`);
+      setNewCategoryLabel("");
+      setSelectedIconLabel(null);
+    } catch (error) {
+      console.error("Erro ao salvar categoria:", error);
+      alert("Erro ao salvar categoria.");
+    }
   };
 
-  const handleDeleteCategory = (label: string) => {
+  // --- FIREBASE: Deletar Categoria ---
+  const handleDeleteCategory = async (id: string | undefined, label: string) => {
+    if (!id) return;
+    
     if (confirm(`Tem certeza que deseja excluir a categoria "${label}"?`)) {
-      setCategories((prev) => prev.filter((c) => c.label !== label));
-      addActivity(`Categoria de fotos "${label}" foi excluida.`);
+      try {
+        await deleteDoc(doc(db, "photo_categories", id));
+        addActivity(`Categoria "${label}" foi excluída.`);
+      } catch (error) {
+        console.error("Erro ao deletar categoria:", error);
+      }
     }
   };
 
@@ -181,6 +239,7 @@ export function AdminPhotos({
           </div>
         </div>
 
+        {/* Filtros */}
         <div className="photo-filter-section">
           <span className="filter-label">Filtrar por categoria:</span>
           <div className="photo-filter-chips">
@@ -194,7 +253,7 @@ export function AdminPhotos({
               const IconComponent = getIconByLabel(cat.iconLabel);
               return (
                 <button
-                  key={cat.label}
+                  key={cat.id || cat.label}
                   className={`filter-chip ${selectedCategory === cat.label ? "filter-chip--active" : ""}`}
                   onClick={() => setSelectedCategory(cat.label)}
                 >
@@ -206,6 +265,7 @@ export function AdminPhotos({
           </div>
         </div>
 
+        {/* Galeria */}
         <div className="photo-gallery-section">
           <div className="section-header-bar">
             <Image size={20} />
@@ -247,6 +307,7 @@ export function AdminPhotos({
 
       </div>
 
+      {/* MODAL: Adicionar Foto */}
       {showAddPhotoModal && (
         <div className="modal-overlay-custom">
           <div className="modal-box">
@@ -260,12 +321,12 @@ export function AdminPhotos({
               <label>Nome da Foto</label>
               <input
                 type="text"
-                placeholder="Ex: Decoracao de Mesa"
+                placeholder="Ex: Decoração de Mesa"
                 value={newPhoto.name}
                 onChange={(e) => setNewPhoto({ ...newPhoto, name: e.target.value })}
               />
 
-              <label>Descricao</label>
+              <label>Descrição</label>
               <textarea
                 placeholder="Descreva a foto..."
                 value={newPhoto.description}
@@ -279,7 +340,7 @@ export function AdminPhotos({
               >
                 <option value="">Selecione...</option>
                 {categories.map((c) => (
-                  <option key={c.label} value={c.label}>{c.label}</option>
+                  <option key={c.id || c.label} value={c.label}>{c.label}</option>
                 ))}
               </select>
 
@@ -314,8 +375,13 @@ export function AdminPhotos({
                 <button type="button" className="btn-c" onClick={() => setShowAddPhotoModal(false)}>
                   Cancelar
                 </button>
-                <button type="button" className="btn-s" onClick={handleAddPhoto}>
-                  Salvar Foto
+                <button 
+                  type="button" 
+                  className="btn-s" 
+                  onClick={handleAddPhoto}
+                  disabled={isUploading}
+                >
+                  {isUploading ? "Salvando..." : "Salvar Foto"}
                 </button>
               </div>
             </div>
@@ -323,6 +389,7 @@ export function AdminPhotos({
         </div>
       )}
 
+      {/* MODAL: Gerenciar Categorias */}
       {showCategoryModal && (
         <div className="modal-overlay-custom">
           <div className="modal-box modal-large">
@@ -334,7 +401,7 @@ export function AdminPhotos({
             </div>
 
             <div className="modal-form">
-              <label>Selecione um Icone</label>
+              <label>Selecione um Ícone</label>
               <div className="icon-picker-grid">
                 {ICON_OPTIONS.map(({ label, icon: Icon }) => (
                   <button
@@ -352,7 +419,7 @@ export function AdminPhotos({
               <label>Nome da Categoria</label>
               <input
                 type="text"
-                placeholder="Ex: Decoracao"
+                placeholder="Ex: Decoração"
                 value={newCategoryLabel}
                 onChange={(e) => setNewCategoryLabel(e.target.value)}
               />
@@ -373,7 +440,7 @@ export function AdminPhotos({
                   {categories.map((cat) => {
                     const IconComponent = getIconByLabel(cat.iconLabel);
                     return (
-                      <div key={cat.label} className="category-list-item">
+                      <div key={cat.id || cat.label} className="category-list-item">
                         <div className="category-list-info">
                           <IconComponent size={20} className="category-icon" />
                           <span className="category-list-name">{cat.label}</span>
@@ -381,7 +448,7 @@ export function AdminPhotos({
                         <div className="category-list-actions">
                           <button 
                             className="btn-icon-delete"
-                            onClick={() => handleDeleteCategory(cat.label)}
+                            onClick={() => handleDeleteCategory(cat.id, cat.label)}
                           >
                             <Trash2 size={16} /> Excluir
                           </button>

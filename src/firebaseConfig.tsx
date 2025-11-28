@@ -11,8 +11,7 @@ const firebaseConfig = {
   appId: "1:664173332248:web:a5999556ddab0373a9006d"
 };
 
-// Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
 
-// Exporta a instância do Firestore
 export const db = getFirestore(app);
+// Removida a linha: export const storage = getStorage(app);
