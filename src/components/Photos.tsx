@@ -191,7 +191,7 @@ export function PhotoGallery() {
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-800 mb-4">
               Galeria de Fotos
             </h1>
-            <p className="text-gray-600 mt-2">Confira nossas categorias</p>
+            <p className="text-gray-600 mt-2">Confira nossas imagens</p>
           </div>
           
           {/* Filtros */}
