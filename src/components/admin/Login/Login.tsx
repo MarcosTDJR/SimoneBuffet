@@ -1,15 +1,16 @@
-// src/components/admin/Login/Login.tsx
 import React, { useState } from "react";
 import "./Login.css";
 
 // --- IMPORTAÇÕES DO FIREBASE ---
 import { initializeApp, getApp, getApps } from "firebase/app";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
-// --- IMPORTAÇÃO DO SERVIÇO ---
-import { authService } from "../../../services/authService";
+// --- TOASTIFY (Avisos Bonitos) ---
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-// --- SUAS IMAGENS ORIGINAIS ---
+// --- SUAS IMAGENS ORIGINAIS (MANTIDAS) ---
 import boloWhite from "/Icons/bolo-white.png";
 import boloColor from "/Icons/bolo-color.gif";
 import fundo from "/Icons/rectangle 19.png";
@@ -19,21 +20,21 @@ import loginOriginal from "/Icons/b.png";
 import animacaoSalada from "/Icons/healthy-food (1).gif";
 import fruitSaladPana from "/Icons/fruit salad-pana.gif";
 import healthyFoodBro from "/Icons/healthy food-bro.png";
-import userIcon from "/Icons/user.png";
 import senhaIcon from "/Icons/senha.png";
 import olhoAberto from "/Icons/olhoAberto.png";
 import olhoFechado from "/Icons/olhoFechado.png";
 import emailIcon from "/Icons/email.png";
+// Mantidos para evitar erro de import no build, caso algo ainda referencie
 import codigoIcon from "/Icons/codigoIcon.png";
 import iconeErroCodigo from "/Icons/iconeErroCodigo.png";
 import fundoCinzaDireita from "/Icons/fundoCinzaDireita.png";
 
-import { useNavigate } from "react-router-dom";
-
+// --- CONFIGURAÇÃO FIREBASE ---
 const firebaseConfig = JSON.parse(
   (typeof window !== 'undefined' && (window as any).__firebase_config) || '{}'
 );
 
+// Inicialização Segura
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
@@ -42,208 +43,87 @@ interface LoginProps {
 }
 
 const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => void }) => {
+  // Estados de Login
   const [credenciais, setCredenciais] = useState({ usuario: "", senha: "" });
   const [lembrar, setLembrar] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [mostrarSenha, setMostrarSenha] = useState(false);
 
-  // Recuperação
+  // Recuperação (Simplificado: Apenas controle de modo e email)
   const [modoRecuperacao, setModoRecuperacao] = useState(false);
-  const [etapaRecuperacao, setEtapaRecuperacao] = useState(1); // 1=email, 2=codigo, 3=nova senha
   const [email, setEmail] = useState("");
-  const [codigo, setCodigo] = useState(["", "", "", ""]);
-  const [tempoRestante, setTempoRestante] = useState(600); // 10 minutos
-  const [novaSenha, setNovaSenha] = useState("");
-  const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [mostrarNovaSenha, setMostrarNovaSenha] = useState(false);
-  const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
-
-  // modal + toast
-  const [mostrarModal, setMostrarModal] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [mostrarToast, setMostrarToast] = useState(false);
   
-  // Estado de carregamento para feedback visual
+  // Estado de carregamento
   const [loading, setLoading] = useState(false);
-
-  React.useEffect(() => {
-    if (modoRecuperacao && etapaRecuperacao === 2 && tempoRestante > 0) {
-      const timer = setInterval(() => {
-        setTempoRestante((prev) => prev - 1);
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-    if (tempoRestante === 0 && modoRecuperacao && etapaRecuperacao === 2) {
-      alert("Código expirado! Solicite um novo código.");
-      setEtapaRecuperacao(1);
-      setTempoRestante(600);
-    }
-  }, [modoRecuperacao, etapaRecuperacao, tempoRestante]);
-
-  const formatarTempo = (segundos: number) => {
-    const minutos = Math.floor(segundos / 60);
-    const segs = segundos % 60;
-    return `${minutos}:${segs.toString().padStart(2, "0")}`;
-  };
-
-  const handleCodigoChange = (index: number, valor: string) => {
-    if (valor.length > 1) return;
-    if (valor !== "" && !/^\d$/.test(valor)) return;
-
-    const novoCodigo = [...codigo];
-    novoCodigo[index] = valor;
-    setCodigo(novoCodigo);
-
-    if (valor !== "" && index < 3) {
-      const nextInput = document.getElementById(`codigo-${index + 1}`) as HTMLInputElement | null;
-      nextInput?.focus();
-    }
-  };
-
-  const handleCodigoKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && codigo[index] === "" && index > 0) {
-      const prevInput = document.getElementById(`codigo-${index - 1}`) as HTMLInputElement | null;
-      prevInput?.focus();
-    }
-    if (e.key === "ArrowLeft" && index > 0) {
-      const prevInput = document.getElementById(`codigo-${index - 1}`) as HTMLInputElement | null;
-      prevInput?.focus();
-    }
-    if (e.key === "ArrowRight" && index < 3) {
-      const nextInput = document.getElementById(`codigo-${index + 1}`) as HTMLInputElement | null;
-      nextInput?.focus();
-    }
-  };
-
-  const showToast = (msg: string, duration = 3000) => {
-    setToastMessage(msg);
-    setMostrarToast(true);
-    setTimeout(() => {
-      setMostrarToast(false);
-    }, duration);
-  };
-
-  // --- VERIFICAÇÃO DE CÓDIGO ---
-  const verificarCodigo = async () => {
-    const codigoCompleto = codigo.join("");
-    if (codigoCompleto.length !== 4) {
-      showToast("Digite os 4 dígitos do código.");
-      return;
-    }
-
-    setLoading(true);
-    // Chama o serviço para validar no Firebase
-    const isValid = await authService.validarCodigo(email, codigoCompleto);
-    setLoading(false);
-
-    if (isValid) {
-      setEtapaRecuperacao(3);
-      showToast("Código verificado. Você pode criar uma nova senha.");
-    } else {
-      showToast("Código incorreto ou expirado.");
-      setMostrarModal(true);
-    }
-  };
-
-  // --- CONFIRMAR SENHA ---
-  const confirmarNovaSenha = async () => {
-    if (!novaSenha || !confirmarSenha) {
-      showToast("Preencha os campos de senha.");
-      return;
-    }
-
-    if (novaSenha !== confirmarSenha) {
-      showToast("As senhas não coincidem!");
-      return;
-    }
-
-    setLoading(true);
-    // Invalida o código no banco
-    await authService.invalidarCodigo(email);
-    setLoading(false);
-
-    // AQUI: Simulação de troca de senha (já que não temos backend Node)
-    console.log("Senha alterada com sucesso (Simulação Backend).");
-    showToast("Senha alterada com sucesso!");
-    
-    // Reset do fluxo
-    setModoRecuperacao(false);
-    setEtapaRecuperacao(1);
-    setEmail("");
-    setCodigo(["", "", "", ""]);
-    setNovaSenha("");
-    setConfirmarSenha("");
-    setTempoRestante(600);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    // Se estiver em modo recuperação, segue o fluxo de recuperação.
+    // --- MODO RECUPERAÇÃO (Envio de Link Nativo) ---
     if (modoRecuperacao) {
-      if (etapaRecuperacao === 1) {
-        // --- ENVIO DE EMAIL ---
-        if (!email || email.trim() === "" || !email.includes("@")) {
-          showToast("Insira um email válido.");
-          return;
-        }
+      if (!email || email.trim() === "" || !email.includes("@")) {
+        toast.warn("⚠️ Por favor, insira um e-mail válido.");
+        return;
+      }
+      
+      setLoading(true);
+      try {
+        // Método nativo do Firebase
+        await sendPasswordResetEmail(auth, email);
         
-        setLoading(true);
-        // Chama o serviço do EmailJS
-        const enviado = await authService.enviarCodigoRecuperacao(email);
-        setLoading(false);
-
-        if (enviado) {
-          console.log("Enviando email para:", email);
-          setEtapaRecuperacao(2);
-          setTempoRestante(600);
-          showToast("Código enviado para seu e-mail.");
+        // AVISO MODERNO
+        toast.success("Link enviado! Verifique seu e-mail para redefinir a senha.", {
+          autoClose: 5000,
+          theme: "colored"
+        });
+        
+        // Retorna ao login e limpa campo
+        toggleRecuperacao();
+        setEmail("");
+        
+      } catch (error: any) {
+        console.error("Erro Recuperação:", error);
+        if (error.code === 'auth/user-not-found') {
+           toast.error("E-mail não encontrado no sistema.");
         } else {
-          showToast("Erro ao enviar e-mail. Tente novamente.");
+           toast.error("Erro ao enviar e-mail. Tente novamente.");
         }
-
-      } else if (etapaRecuperacao === 2) {
-        verificarCodigo();
-      } else if (etapaRecuperacao === 3) {
-        confirmarNovaSenha();
+      } finally {
+        setLoading(false);
       }
       return;
     }
 
-    // ---------- MODO LOGIN NORMAL ----------
+    // --- MODO LOGIN NORMAL ---
     const usuario = credenciais.usuario.trim();
     const senha = credenciais.senha.trim();
 
     if (!usuario || !senha) {
-      showToast("Preencha usuário e senha.");
+      toast.info("Preencha usuário e senha.");
       return;
     }
 
     setLoading(true);
     try {
-      // Login Real com Firebase Auth
       await signInWithEmailAndPassword(auth, usuario, senha);
       
-      // Chama a prop do pai (Admin.tsx) para redirecionar
+      // Sucesso
       onLogin(usuario, senha);
+      toast.success("Bem-vinda de volta! 👋", { theme: "colored" });
       
-      // Reset de segurança
+      // Limpa estados
       setModoRecuperacao(false);
-      setEtapaRecuperacao(1);
       setEmail("");
-      setCodigo(["", "", "", ""]);
-      setNovaSenha("");
-      setConfirmarSenha("");
-      setTempoRestante(600);
-
-      showToast("Entrando...");
+      
     } catch (error: any) {
       console.error("Erro no Login:", error);
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        showToast("E-mail ou senha incorretos.");
+      if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+        toast.error("E-mail ou senha incorretos.");
+      } else if (error.code === 'auth/too-many-requests') {
+        toast.warning("Muitas tentativas. Aguarde alguns instantes.");
       } else {
-        showToast("Erro no login.");
+        toast.error("Erro ao fazer login.");
       }
     } finally {
       setLoading(false);
@@ -253,87 +133,25 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
   const toggleRecuperacao = (e?: React.MouseEvent) => {
     if (e) e.preventDefault();
     setModoRecuperacao((prev) => !prev);
-    setEtapaRecuperacao(1);
     setEmail("");
-    setCodigo(["", "", "", ""]);
-    setNovaSenha("");
-    setConfirmarSenha("");
-    setTempoRestante(600);
   };
 
+  // A estrutura abaixo mantém as classes exatas do seu CSS original
   return (
     <div className="login-box">
       <h1>
         Painel <span className="simone-gradient">Administrativo</span>
       </h1>
 
-      {/* Modal de erro */}
-      {mostrarModal && (
-        <div
-          className="modal-overlay"
-          onClick={() => setMostrarModal(false)}
-          style={{
-            position: "fixed",
-            inset: -100,
-            background: "rgba(0,0,0,0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 99,
-          }}
-        >
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <img src={iconeErroCodigo} alt="Erro" className="icone-erro-codigo" />
-            <h2 style={{ marginTop: 0 }}>Código Incorreto</h2>
-            <p>O código digitado está incorreto. Por favor, tente novamente.</p>
-            <div className="modal-actions">
-              <button
-                className="btn-modal"
-                onClick={() => {
-                  setMostrarModal(false);
-                  const first = document.getElementById("codigo-0") as HTMLInputElement | null;
-                  first?.focus();
-                }}
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Toast (simples) */}
-      {mostrarToast && (
-        <div
-          role="status"
-          aria-live="polite"
-          style={{
-            position: "fixed",
-            right: 20,
-            bottom: 20,
-            zIndex: 10000,
-            background: "rgba(0,0,0,0.85)",
-            color: "#fff",
-            padding: "10px 14px",
-            borderRadius: 8,
-            boxShadow: "0 8px 20px rgba(0,0,0,0.25)",
-            maxWidth: 320,
-            fontSize: 14,
-          }}
-        >
-          {toastMessage}
-        </div>
-      )}
-
-      {/* noValidate = true quando não estamos em modoRecuperacao */}
+      {/* Form com noValidate para não usar balões padrão do navegador */}
       <form onSubmit={handleSubmit} autoComplete="on" noValidate={!modoRecuperacao}>
-        <div
-          className={`formulario-wrapper ${modoRecuperacao ? "modo-recuperacao" : ""} ${etapaRecuperacao === 2 ? "etapa-2" : ""} ${etapaRecuperacao === 3 ? "etapa-3" : ""}`}
-        >
-          {/* PAINEL 1: LOGIN */}
+        
+        {/* MANTIDO: A classe 'formulario-wrapper' e a lógica 'modo-recuperacao'.
+           Isso garante que a animação de deslizar (slide) do seu CSS continue funcionando.
+        */}
+        <div className={`formulario-wrapper ${modoRecuperacao ? "modo-recuperacao" : ""}`}>
+          
+          {/* --- PAINEL 1: LOGIN (INTOCADO) --- */}
           <div className="painel-login">
             <div className="input-group">
               <label htmlFor="email-login">Usuário</label>
@@ -366,7 +184,6 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
                 type="button"
                 className="toggle-senha"
                 onClick={() => setMostrarSenha(!mostrarSenha)}
-                aria-label={mostrarSenha ? "Esconder senha" : "Mostrar senha"}
                 style={{
                   position: "absolute",
                   right: 8,
@@ -412,7 +229,7 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
             </div>
           </div>
 
-          {/* PAINEL 2: RECUPERAÇÃO (email) */}
+          {/* --- PAINEL 2: RECUPERAÇÃO (EMAIL) --- */}
           <div className="painel-recuperacao">
             <div className="input-group">
               <label htmlFor="email-recuperacao">Email de Recuperação</label>
@@ -425,19 +242,23 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Digite seu email"
                 autoComplete="off"
-                required={modoRecuperacao && etapaRecuperacao === 1}
-                disabled={!modoRecuperacao || etapaRecuperacao !== 1}
+                required={modoRecuperacao}
+                disabled={!modoRecuperacao}
               />
             </div>
+            
+            {/* Pequeno texto de ajuda para preencher o espaço visual deixado pelo timer */}
+            <p style={{fontSize: '0.9rem', color: '#666666a2', marginBottom: '20px', marginTop: '-10px', paddingLeft: '60px', textAlign: 'left'}}>
+              *Você receberá um link seguro para criar uma nova senha.
+            </p>
 
             <div className="acoes-recuperacao">
               <button
-                type="button"
-                className="btn-enviar-codigo"
-                onClick={handleSubmit} 
-                disabled={(!modoRecuperacao || etapaRecuperacao !== 1) || loading}
+                type="submit"
+                className="btn-enviar-codigo" // Mantido o nome da classe para não perder o estilo (largura/cor)
+                disabled={(!modoRecuperacao) || loading}
               >
-                {loading ? "Enviando..." : "Enviar Código"}
+                {loading ? "Enviando..." : "Enviar Link"}
               </button>
               <button
                 type="button"
@@ -449,120 +270,6 @@ const LoginBox = ({ onLogin }: { onLogin: (usuario: string, senha: string) => vo
             </div>
           </div>
 
-          {/* PAINEL 3: CÓDIGO DE VERIFICAÇÃO */}
-          <div className="painel-codigo">
-            <div className="codigo-header">
-              <img src={codigoIcon} alt="Código" className="codigo-icon" />
-            </div>
-
-            <div className="codigo-container">
-              <div className="codigo-inputs">
-                {codigo.map((digito, index) => (
-                  <input
-                    key={index}
-                    id={`codigo-${index}`}
-                    type="text"
-                    inputMode="numeric"
-                    pattern="\d*"
-                    maxLength={1}
-                    value={digito}
-                    onChange={(e) => handleCodigoChange(index, e.target.value)}
-                    onKeyDown={(e) => handleCodigoKeyDown(index, e)}
-                    className="input-codigo"
-                    autoComplete="one-time-code"
-                    aria-label={`Dígito ${index + 1}`}
-                    style={{ textAlign: "center" }}
-                    disabled={!modoRecuperacao || etapaRecuperacao !== 2}
-                    required={modoRecuperacao && etapaRecuperacao === 2}
-                  />
-                ))}
-              </div>
-
-              <p className="codigo-aviso">
-                É importante que você digite o código dentro de{" "}
-                <span className="tempo-destaque">{formatarTempo(tempoRestante)}</span> minutos. Após esse período, será necessário solicitar um novo código.
-              </p>
-            </div>
-
-            <div className="btn-enviar">
-              <button 
-                type="button" 
-                className="entrar" 
-                onClick={verificarCodigo} 
-                disabled={(!modoRecuperacao || etapaRecuperacao !== 2) || loading}
-              >
-                {loading ? "Verificando..." : "Verificar Código"}
-              </button>
-              <button type="button" className="btn-voltar-codigo" onClick={toggleRecuperacao}>
-                Voltar
-              </button>
-            </div>
-          </div>
-
-          {/* PAINEL 4: NOVA SENHA */}
-          <div className="painel-nova-senha">
-            <div className="input-group">
-              <img className="icon-senha" src={senhaIcon} alt="" />
-              <label htmlFor="nova-senha">Nova Senha</label>
-              <input
-                id="nova-senha"
-                type={mostrarNovaSenha ? "text" : "password"}
-                value={novaSenha}
-                placeholder="Digite sua nova senha"
-                onChange={(e) => setNovaSenha(e.target.value)}
-                required={modoRecuperacao && etapaRecuperacao === 3}
-                disabled={!modoRecuperacao || etapaRecuperacao !== 3}
-              />
-              <button
-                type="button"
-                className="toggle-senha"
-                onClick={() => setMostrarNovaSenha(!mostrarNovaSenha)}
-                aria-label={mostrarNovaSenha ? "Esconder senha" : "Mostrar senha"}
-              >
-                <img src={mostrarNovaSenha ? olhoAberto : olhoFechado} alt="" />
-              </button>
-            </div>
-
-            <div className="input-group">
-              <img className="icon-senha" src={senhaIcon} alt="" />
-              <label htmlFor="confirmar-senha">Confirmar Senha</label>
-              <input
-                id="confirmar-senha"
-                type={mostrarConfirmarSenha ? "text" : "password"}
-                value={confirmarSenha}
-                placeholder="Confirme sua nova senha"
-                onChange={(e) => setConfirmarSenha(e.target.value)}
-                required={modoRecuperacao && etapaRecuperacao === 3}
-                disabled={!modoRecuperacao || etapaRecuperacao !== 3}
-              />
-              <button
-                type="button"
-                className="toggle-senha"
-                onClick={() => setMostrarConfirmarSenha(!mostrarConfirmarSenha)}
-                aria-label={mostrarConfirmarSenha ? "Esconder senha" : "Mostrar senha"}
-              >
-                <img src={mostrarConfirmarSenha ? olhoAberto : olhoFechado} alt="" />
-              </button>
-            </div>
-
-            <div className="btn-enviar painel-nova-acao">
-              <button
-                type="button"
-                className="btn-voltar-nova-senha"
-                onClick={toggleRecuperacao}
-              >
-                Voltar
-              </button>
-              <button
-                type="button"
-                className="entrar"
-                onClick={confirmarNovaSenha}
-                disabled={(!modoRecuperacao || etapaRecuperacao !== 3) || loading}
-              >
-                {loading ? "Confirmando..." : "Confirmar"}
-              </button>
-            </div>
-          </div>
         </div>
       </form>
     </div>
@@ -575,21 +282,29 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   return (
     <div className="login-container" style={{ backgroundImage: `url(${fundo})` }}>
       
-      {/* Botao Voltar para o Site */}
+      {/* Botão Voltar para o Site */}
       <button 
-        className="btn-voltar-site"
+        className="btn-voltar-site" 
         onClick={() => navigate("/")}
+        // Estilo inline apenas para garantir posicionamento caso a classe CSS tenha sido afetada
+        style={{
+             position: 'absolute', top: '20px', left: '20px', zIndex: 100,
+             padding: '10px 20px', borderRadius: '30px', border: 'none',
+             background: 'rgba(255,255,255,0.95)', color: '#e91e63', fontWeight: 'bold',
+             display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer',
+             boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+        }}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="m12 19-7-7 7-7"/>
           <path d="M19 12H5"/>
         </svg>
-        Pagina Inicial
+        Voltar ao Site
       </button>
 
       <img src={frutas} alt="Frutas" />
       <img src={frutasbaixo} alt="Frutas Baixo" />
-      <img src={animacaoSalada} alt="Animacao Salada" className="animacao-salada" />
+      <img src={animacaoSalada} alt="Animação Salada" className="animacao-salada" />
       <img src={fruitSaladPana} alt="Fruit Salad Pana" className="fruit-salad-pana" />
       <img src={healthyFoodBro} alt="Healthy Food Bro" className="healthy-food-bro" />
 
@@ -607,6 +322,20 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
       <LoginBox onLogin={onLogin} />
       <div className="login-box-outline"></div>
+
+      {/* Container do Toastify Global na tela de Login */}
+      <ToastContainer 
+        position="top-center"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </div>
   );
 };

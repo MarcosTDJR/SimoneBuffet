@@ -1264,8 +1264,19 @@
 
     .login-box h1 {
     font-size: 2.4rem;
-    margin-bottom: 150px;
   }
+
+  .formulario-wrapper .painel-recuperacao {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 90px;
+}
+
 }
 
 /* Laptops grandes (até 1200px) */
