@@ -1,8 +1,35 @@
+# 🍽️ Simone Buffet – Website Profissional
 
-  # Site do Buffet Simone
+## 🎯 Objetivo do Projeto
+Criar um site profissional e responsivo para o Buffet Simone, apresentando seus serviços, portfólio e facilitando o contato com clientes através de um botão direto para orçamento via WhatsApp.
 
-Há mais de 15 anos, a Chef Simone dedica sua vida a criar experiências gastronômicas únicas e memoráveis. O que começou como uma paixão pela culinária familiar se transformou no Buffet Simone, referência em eventos especiais na região.
+---
 
-Nossa filosofia é simples: cada prato conta uma história, cada sabor desperta uma emoção. Utilizamos apenas ingredientes frescos e de qualidade premium, preparados com técnicas tradicionais e um toque especial de carinho.
+## 🚀 Funcionalidades
+- Página Home com informações do buffet
+- Botão **Solicitar Orçamento** → redireciona para WhatsApp
+- Seção **Quem é Simone**, apresentando sua história e especialização
+- Galeria de **fotos reais** dos serviços prestados (bolos, doces, salgados e eventos)
+- Área **Admin** para edição completa do conteúdo:
+  - Troca de fotos
+  - Atualização de textos
+  - Modificação de seções do site
 
-Do planejamento à execução, cuidamos de cada detalhe para que seu evento seja exatamente como você sonhou. Porque acreditamos que momentos especiais merecem sabores inesquecíveis.
+---
+
+## 🛠️ Tecnologias Utilizadas
+- **HTML**
+- **CSS**
+- **TypeScript**
+- **Vite**
+- **GitHub**
+- **Vercel** para deploy
+
+---
+
+## ▶️ Como Executar o Projeto
+```bash
+git clone https://github.com/MarcosTDJR/SimoneBuffet
+cd SimoneBuffet
+npm install
+npm run dev
